@@ -55,6 +55,25 @@ PM_WEIGHTS = {"Jakość": 0.55, "Forma": 0.10, "Dostępność": 0.20, "Konsekwen
 # DefaultSegmentFactorCalculator.ts. Dla młodzieży leagueMultiplier bierzemy z rank_p (v7),
 # bo produkcyjnie KAŻDA kategoria (A1/B1/C1...) ma płaski multiplier ~0.08 niezależnie od poziomu.
 PM_SCORE_MODE = _secret("PM_SCORE_MODE", "v7")   # 'v7' (realny score) lub 'prod' (stary match_score)
+# Zakres rankowania jakości: 'selected' (domyślnie — w obrębie wybranej ligi, dla klubów)
+# albo 'total' (ze WSZYSTKICH meczów sezonu — dla raportów "grali w starszych/w górę").
+QUALITY_SCOPE = (_secret("PM_QUALITY_SCOPE", "selected") or "selected").lower()
+
+# Tryb rankingu: 'standard' (PM Index jak dotąd) albo 'talent' (mix dla raportów "grali w górę":
+# jakość league-aware + poziom [CLJ/seniorzy/skok 2+ roczniki] + wolumen). Wagi strojone sekretami.
+PM_RANK_MODE = (_secret("PM_RANK_MODE", "standard") or "standard").lower()
+def _fnum(key, dflt):
+    try:
+        v = _secret(key, "")
+        return float(v) if v not in ("", None) else float(dflt)
+    except Exception:
+        return float(dflt)
+W_JAKOSC = _fnum("PM_W_JAKOSC", 0.45)    # waga jakości (league-aware)
+W_POZIOM = _fnum("PM_W_POZIOM", 0.45)    # waga poziomu (CLJ/seniorzy/duży skok)
+W_WOLUMEN = _fnum("PM_W_WOLUMEN", 0.10)  # waga wolumenu (minuty łącznie)
+W_CLJ = _fnum("PM_W_CLJ", 1.0)           # w "poziomie": waga minut CLJ
+W_SENIOR = _fnum("PM_W_SENIOR", 0.8)     # w "poziomie": waga minut w seniorach
+W_SKOK = _fnum("PM_W_SKOK", 0.6)         # w "poziomie": waga minut 2+ roczniki w górę
 
 AGE_IMPACT = 0.35
 AGE_CONST = 0.816496580927726
@@ -158,6 +177,27 @@ def _rank_p_series(df):
         uniq = {u: _detect_rank_p(u) for u in df.loc[miss, "play_name"].astype(str).unique()}
         rp = rp.where(~miss, df.loc[miss, "play_name"].astype(str).map(uniq))
     return pd.to_numeric(rp, errors="coerce")
+
+
+_CAT_AGE_PATS = [(r'(^A1$|U-?19)', 19), (r'(^A2$|U-?18)', 18), (r'(^B1$|U-?17)', 17),
+                 (r'(^B2$|U-?16)', 16), (r'(^C1$|U-?15)', 15), (r'(^C2$|U-?14)', 14),
+                 (r'(^D1$|U-?13)', 13), (r'(^D2$|U-?12)', 12)]
+
+
+def _cat_age(name):
+    """Poziom wiekowy rozgrywek z nazwy ligi: A1=19 … D2=12, senior=20, junior nieznany=NaN."""
+    n = str(name)
+    for pat, v in _CAT_AGE_PATS:
+        if re.search(pat, n, re.I):
+            return v
+    if (re.search(r'^(A1|A2|B1|B2|C1|C2|D1|D2)$', n, re.I) or n.upper().startswith("CLJ")
+            or re.search(r'U-?1[0-9]', n, re.I)):
+        return np.nan
+    return 20
+
+
+def _cat_age_series(df):
+    return df["league_name"].map(_cat_age)
 
 
 def compute_pm_score(df):
@@ -379,7 +419,7 @@ def _play_metrics(g):
     mins, goals = g["minutes"].sum(), g["goals"].sum()
     cards = g["yellow_cards"].sum() + g["red_cards"].sum()
     cidx = g["yellow_cards"].sum() + 2 * g["red_cards"].sum()
-    s = g["match_score"].dropna()
+    s = g["match_score"].dropna() if "match_score" in g.columns else pd.Series([], dtype=float)
     forma = ((s.tail(5).mean() - s.mean()) / s.mean()) if len(s) >= 3 and s.mean() else np.nan
     return pd.Series({"min_play": mins, "mecze_play": g["match_id"].nunique(), "gole_play": goals,
                       "kartki_play": cards, "score_play": s.mean() if len(s) else np.nan,
@@ -391,7 +431,7 @@ def _play_metrics(g):
 
 def _total_metrics(g):
     mins, goals = g["minutes"].sum(), g["goals"].sum()
-    s = g["match_score"].dropna()
+    s = g["match_score"].dropna() if "match_score" in g.columns else pd.Series([], dtype=float)
     lead = (g.groupby("league_name")["minutes"].sum().idxmax()
             if g["minutes"].sum() > 0 and g["league_name"].notna().any() else None)
     return pd.Series({"min_total": mins, "mecze_total": g["match_id"].nunique(),
@@ -427,8 +467,15 @@ def build(_stats, _matches):
     mn = mn_all[pl.index]
     den = mn.groupby(pl["player_id"]).sum().replace(0, np.nan)
     df["pm_score"] = df["player_id"].map((pl["_sc"] * mn).groupby(pl["player_id"]).sum() / den)
-    df["pm_quality"] = df["player_id"].map((pl["_sp"] * mn).groupby(pl["player_id"]).sum() / den)
-    df["rank_p_avg"] = df["player_id"].map((pl["_rank_p"] * mn).groupby(pl["player_id"]).sum() / den).round(1)
+
+    # Zakres rankowania jakości: 'selected' = wybrana liga (kluby); 'total' = wszystkie mecze
+    # sezonu (raporty "grali w górę" — inaczej zawodnicy grający głównie wyżej mają pustą jakość).
+    if QUALITY_SCOPE == "total" or PM_RANK_MODE == "talent":
+        qf, qmn, qden = mall, mn_all, den_t
+    else:
+        qf, qmn, qden = pl, mn, den
+    df["pm_quality"] = df["player_id"].map((qf["_sp"] * qmn).groupby(qf["player_id"]).sum() / qden)
+    df["rank_p_avg"] = df["player_id"].map((qf["_rank_p"] * qmn).groupby(qf["player_id"]).sum() / qden).round(1)
 
     # Forma/Konsekwencja ze stats_part per mecz (gęste, league-aware)
     def _form(gp):
@@ -436,7 +483,7 @@ def build(_stats, _matches):
         m = x.mean()
         return pd.Series({"_forma_px": ((x.tail(5).mean() - m) / m) if len(x) >= 3 and m else np.nan,
                           "_kons_px": (1 / (1 + x.std(ddof=0))) if len(x) >= 2 else np.nan})
-    pform = pl.groupby("player_id").apply(_form)
+    pform = qf.groupby("player_id").apply(_form)
     df["_forma_px"] = df["player_id"].map(pform["_forma_px"])
     df["_kons_px"] = df["player_id"].map(pform["_kons_px"])
 
@@ -449,15 +496,16 @@ def build(_stats, _matches):
         df["Jakość"] = df["score_play"].rank(pct=True)
         df["Forma"] = df["forma"].rank(pct=True)
         df["Konsekwencja"] = df["konsekwencja"].rank(pct=True)
-    df["Dostępność"] = df["min_play"].rank(pct=True)
+    df["Dostępność"] = (df["min_total"] if (QUALITY_SCOPE == "total" or PM_RANK_MODE == "talent")
+                        else df["min_play"]).rank(pct=True)
     df["Dyscyplina"] = (-df["kartki_per90"]).rank(pct=True)
-    df["PM_base"] = sum(df[a].fillna(0) * w for a, w in PM_WEIGHTS.items())
+    # premia kontekstowa (kolumna „Premia”; w trybie standard wchodzi do PM Index)
     sm = df["senior_minutes"].fillna(0)
     sq = df["senior_squad_apps"].fillna(0)
     df["PM_premia"] = (df["gra_ze_starszymi"].fillna(False).astype(bool).astype(float) * B_UP
                        + (sm > 0).astype(float) * B_SEN_PLAYED
                        + ((sm == 0) & (sq > 0)).astype(float) * B_SEN_SQUAD)
-    df["PM_Index"] = df["PM_base"] + df["PM_premia"]
+
     lg = _matches.groupby("player_id")["league_name"].agg(lambda s: set(s.dropna()))
     pp = _matches.groupby("player_id")["play_name"].agg(lambda s: set(s.dropna()))
     df["_leagues"] = df["player_id"].map(lg)
@@ -467,6 +515,31 @@ def build(_stats, _matches):
                                  regex=True, na=False)]
     cljm = clj.groupby("player_id")["minutes"].sum()
     df["clj_minutes"] = df["player_id"].map(cljm).fillna(0)
+
+    # minuty "2+ roczniki w górę" (duży skok) — sygnał poziomu w trybie talent
+    mall["_ca"] = _cat_age_series(mall)
+    _by = df.drop_duplicates("player_id").set_index("player_id")["est_birth_year"]
+    own2 = mall["player_id"].map((2026 - _by) + 2)
+    up2_mask = mall["_ca"].notna() & own2.notna() & (mall["_ca"] >= own2) & (mn_all > 0)
+    up2 = mn_all.where(up2_mask, 0).groupby(mall["player_id"]).sum()
+    df["up2_min"] = df["player_id"].map(up2).fillna(0)
+
+    if PM_RANK_MODE == "talent":
+        # mix: jakość (league-aware) + poziom (CLJ/seniorzy/skok) + wolumen
+        Q = df["pm_quality"].rank(pct=True)
+        lvl_raw = (df["clj_minutes"].fillna(0) * W_CLJ
+                   + df["senior_minutes"].fillna(0) * W_SENIOR
+                   + df["up2_min"].fillna(0) * W_SKOK)
+        df["Poziom"] = lvl_raw.rank(pct=True)
+        Vol = df["min_total"].fillna(0).rank(pct=True)
+        wsum = (W_JAKOSC + W_POZIOM + W_WOLUMEN) or 1.0
+        df["PM_base"] = (W_JAKOSC * Q + W_POZIOM * df["Poziom"] + W_WOLUMEN * Vol) / wsum
+        # poziom/wolumen już zawierają sygnał "w górę" → bez podwójnego liczenia premii
+        df["PM_Index"] = df["PM_base"]
+    else:
+        df["PM_base"] = sum(df[a].fillna(0) * w for a, w in PM_WEIGHTS.items())
+        df["PM_Index"] = df["PM_base"] + df["PM_premia"]
+
     ry = _matches["match_date"].dt.year.max()
     df["_ref_year"] = int(ry) if pd.notna(ry) else 2026
     return df
@@ -724,44 +797,51 @@ def main():
             st.markdown(_intro)
 
     # ---- FILTRY ----
-    FILTER_KEYS = ["f_zaw", "f_klub", "f_rozgr", "f_liga", "f_woj",
-                   "f_score", "f_min", "f_mecz", "f_kart", "f_up", "f_kad", "f_sen", "f_clj"]
+    # Reset przez "nonce": po wyczyszczeniu zmieniamy klucze widżetów, więc wszystkie
+    # (także suwaki) startują od wartości domyślnych — to pewniejsze niż pop+rerun.
+    _fn = st.session_state.get("_filter_nonce", 0)
+    def K(base):
+        return f"{base}_{_fn}"
     with st.container(border=True):
         ch = st.columns([6, 1])
         ch[0].markdown("**Filtry**")
-        if ch[1].button("Wyczyść filtry", use_container_width=True):
-            for _k in FILTER_KEYS:
-                st.session_state.pop(_k, None)
+        if ch[1].button("🧹 Wyczyść filtry", use_container_width=True, type="primary"):
+            st.session_state["_filter_nonce"] = _fn + 1
             st.rerun()
         has_region = "region_name" in data.columns and data["region_name"].notna().any()
         if has_region:
             rr = st.columns([2, 6])
             f_reg = rr[0].multiselect("Województwo",
-                                      sorted(data["region_name"].dropna().unique()), key="f_woj")
+                                      sorted(data["region_name"].dropna().unique()), key=K("f_woj"))
         else:
             f_reg = []
         r1 = st.columns([2, 2, 2])
-        q = r1[0].text_input(f"{L['player_one']} (imię/nazwisko)", "", key="f_zaw")
-        f_club = r1[1].multiselect("Klub", sorted(data["club_name"].dropna().unique()), key="f_klub")
+        q = r1[0].text_input(f"{L['player_one']} (imię/nazwisko)", "", key=K("f_zaw"))
+        f_club = r1[1].multiselect("Klub", sorted(data["club_name"].dropna().unique()), key=K("f_klub"))
         f_lg = r1[2].multiselect(f"Rozgrywki (gdziekolwiek {L['played']})",
-                                 sorted({x for s in data["_leagues"].dropna() for x in s}), key="f_rozgr")
+                                 sorted({x for s in data["_leagues"].dropna() for x in s}), key=K("f_rozgr"))
         f_pl = st.multiselect(f"Liga (gdziekolwiek {L['played']})",
-                              sorted({x for s in data["_plays"].dropna() for x in s}), key="f_liga")
+                              sorted({x for s in data["_plays"].dropna() for x in s}), key=K("f_liga"))
         r2 = st.columns(4)
-        def rng(col, label, c, key):
+        def rng(col, label, c, key, integer=False):
             lo, hi = float(np.nanmin(data[col])), float(np.nanmax(data[col]))
             if not np.isfinite(lo) or lo == hi:
                 return (lo, hi)
+            if integer:
+                lo, hi = int(np.floor(lo)), int(np.ceil(hi))
+                if lo == hi:
+                    return (lo, hi)
+                return c.slider(label, lo, hi, (lo, hi), step=1, key=key)
             return c.slider(label, lo, hi, (lo, hi), key=key)
-        s_score = rng("pm_score", "Score (liga)", r2[0], "f_score")
-        s_min = rng("min_play", "Minuty (liga)", r2[1], "f_min")
-        s_mecz = rng("mecze_play", "Mecze (liga)", r2[2], "f_mecz")
-        s_kart = rng("kartki_total", "Kartki total", r2[3], "f_kart")
+        s_score = rng("pm_score", "Score (liga)", r2[0], K("f_score"))
+        s_min = rng("min_play", "Minuty (liga)", r2[1], K("f_min"), integer=True)
+        s_mecz = rng("mecze_play", "Mecze (liga)", r2[2], K("f_mecz"), integer=True)
+        s_kart = rng("kartki_total", "Kartki total", r2[3], K("f_kart"), integer=True)
         r3 = st.columns(4)
-        f_up = r3[0].checkbox("↑ Gra ze starszymi", key="f_up")
-        f_kad = r3[1].checkbox("🪑 W kadrze seniorów", key="f_kad")
-        f_sen = r3[2].checkbox("⚽ Minuty w seniorach", key="f_sen")
-        f_clj = r3[3].checkbox("🏅 Minuty w CLJ", key="f_clj")
+        f_up = r3[0].checkbox("↑ Gra ze starszymi", key=K("f_up"))
+        f_kad = r3[1].checkbox("🪑 W kadrze seniorów", key=K("f_kad"))
+        f_sen = r3[2].checkbox("⚽ Minuty w seniorach", key=K("f_sen"))
+        f_clj = r3[3].checkbox("🏅 Minuty w CLJ", key=K("f_clj"))
 
     # ---- FILTROWANIE ----
     f = data.copy()
