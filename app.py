@@ -271,6 +271,10 @@ CSS = """
 .pmrow{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;}
 .pmcard{border:1px solid #2b3340;border-radius:12px;padding:12px 14px;width:100%;
         background:#191f29;height:100%;box-sizing:border-box;}
+/* tylko rząd z kartami przewija się w bok (reszta kolumn nietknięta) */
+div[data-testid="stHorizontalBlock"]:has(.pmcard){overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;}
+div[data-testid="stHorizontalBlock"]:has(.pmcard) > div[data-testid="column"]{
+        flex:0 0 220px;min-width:220px;width:220px;}
 .pmcard h4{margin:0 0 2px;font-size:15px;color:#e8edf4;}
 .pmcard .sub{font-size:12px;color:#9aa7b6;margin-bottom:8px;line-height:1.4;min-height:30px;}
 .pmcard .pm{font-size:22px;font-weight:700;color:#5db0ff;}
@@ -864,23 +868,19 @@ def main():
         f = f[f["clj_minutes"].fillna(0) > 0]
     f = f.sort_values("PM_Index", ascending=False).reset_index(drop=True)
 
-    # ---- KARTY TOPOWYCH (siatka, natywny wybór — lekki rerun, bez przeładowania) ----
+    # ---- KARTY TOPOWYCH (jeden rząd, przewijany w bok; natywny wybór — lekki rerun) ----
     st.markdown(f"### 🏅 {L['top_players']}")
     if len(f):
         topcards = f.head(15).reset_index(drop=True)
-        per_row = 5
-        for i in range(0, len(topcards), per_row):
-            cols = st.columns(per_row)
-            for j in range(per_row):
-                if i + j >= len(topcards):
-                    break
-                r = topcards.iloc[i + j]
-                with cols[j]:
-                    st.markdown(_card_html(r), unsafe_allow_html=True)
-                    if st.button("Wybierz", key=f"card_{r['player_id']}",
-                                 use_container_width=True):
-                        st.session_state["sel_pid"] = r["player_id"]
-                        st.rerun()
+        cols = st.columns(len(topcards))
+        for j in range(len(topcards)):
+            r = topcards.iloc[j]
+            with cols[j]:
+                st.markdown(_card_html(r), unsafe_allow_html=True)
+                if st.button("Wybierz", key=f"card_{r['player_id']}",
+                             use_container_width=True):
+                    st.session_state["sel_pid"] = r["player_id"]
+                    st.rerun()
     else:
         st.info(L["no_players"])
 
