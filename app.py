@@ -269,19 +269,19 @@ PM_HELP = (
 CSS = """
 <style>
 .pmrow{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;}
-.pmcard{border:1px solid #2b3340;border-radius:12px;padding:12px 14px;width:100%;height:236px;
-        background:#191f29;box-sizing:border-box;overflow:hidden;}
+.pmcard{border:1px solid #2b3340;border-radius:12px;padding:12px 14px;width:100%;
+        background:#191f29;box-sizing:border-box;}
 /* tylko rząd zawierający karty przewija się w bok; kolumny stałej szerokości */
 div[data-testid="stHorizontalBlock"]:has(.pmcard){overflow-x:auto !important;flex-wrap:nowrap !important;padding-bottom:6px;}
 div[data-testid="stHorizontalBlock"]:has(.pmcard) > div[data-testid="column"],
 div[data-testid="stHorizontalBlock"]:has(.pmcard) > div[data-testid="stColumn"]{
         flex:0 0 224px !important;min-width:224px !important;width:224px !important;}
-.pmcard h4{margin:0 0 2px;font-size:15px;color:#e8edf4;}
+.pmcard h4{margin:0 0 2px;font-size:15px;color:#e8edf4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pmcard .sub{font-size:12px;color:#9aa7b6;margin-bottom:8px;line-height:1.4;height:34px;overflow:hidden;}
 .pmcard .pm{font-size:22px;font-weight:700;color:#5db0ff;}
 .pmcard .pmlbl{font-size:10px;color:#8a97a6;letter-spacing:.5px;text-transform:uppercase;}
 .pmcard .row{font-size:12px;color:#c4cdd8;margin-top:6px;}
-.pmcard .badges{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;}
+.pmcard .badges{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;min-height:72px;}
 .b{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;white-space:nowrap;}
 .b.up{background:#2a2150;color:#c4b5fd;}
 .b.sen{background:#16361f;color:#7ee2a0;}
