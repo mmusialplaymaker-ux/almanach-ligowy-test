@@ -269,8 +269,10 @@ PM_HELP = (
 CSS = """
 <style>
 .pmrow{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;}
+.pmcardlink{text-decoration:none;color:inherit;flex:0 0 232px;display:block;}
+.pmcardlink:hover .pmcard{border-color:#5db0ff;box-shadow:0 0 0 1px #5db0ff55;transform:translateY(-2px);}
 .pmcard{flex:0 0 232px;border:1px solid #2b3340;border-radius:12px;padding:12px 14px;
-        background:#191f29;}
+        background:#191f29;transition:border-color .12s,box-shadow .12s,transform .12s;cursor:pointer;height:100%;}
 .pmcard h4{margin:0 0 2px;font-size:15px;color:#e8edf4;}
 .pmcard .sub{font-size:12px;color:#9aa7b6;margin-bottom:8px;line-height:1.4;min-height:30px;}
 .pmcard .pm{font-size:22px;font-weight:700;color:#5db0ff;}
@@ -628,12 +630,13 @@ def cards_html(top):
         klub = r.get("club_name") or r.get("team_name") or "—"
         lead = r.get("liga_wiodaca") or r.get("league_name") or "—"
         cards.append(
+            f'<a class="pmcardlink" href="?sel={r["player_id"]}" target="_self">'
             f'<div class="pmcard"><h4>{r["zawodnik"]}</h4>'
             f'<div class="sub">{klub}<br>liga wiodąca: {lead}</div>'
             f'<div class="pmlbl">PM Index</div><div class="pm">{r["PM_Index"]:.2f}</div>'
             f'<div class="row">{rok} · {age}</div>'
             f'<div class="row">{_i(r.get("min_total"))} min · {_i(r.get("mecze_total"))} meczów (sezon)</div>'
-            f'<div class="badges">{badges_html(r)}</div></div>')
+            f'<div class="badges">{badges_html(r)}</div></div></a>')
     return '<div class="pmrow">' + "".join(cards) + "</div>"
 
 
@@ -907,6 +910,10 @@ def main():
         elif (r.get("senior_squad_apps") or 0) > 0: z.append("🪑")
         if (r.get("clj_minutes") or 0) > 0: z.append("🏅")
         return " ".join(z)
+    # wybór z karty (klik ustawia ?sel=player_id)
+    sel_card = st.query_params.get("sel")
+    sel_card = sel_card if (sel_card and (f["player_id"] == sel_card).any()) else None
+
     ft = f.copy()
     ft["Znaczniki"] = ft.apply(znaczniki, axis=1)
     cmap = {"zawodnik": L["player_one"], "Znaczniki": "Znaczniki", "region_name": "Województwo",
@@ -919,10 +926,26 @@ def main():
             "gole_play": "Gole (liga)", "gole_total": "Gole (total)",
             "kartki_total": "Kartki", "senior_minutes": "Min. seniorzy",
             "clj_minutes": "Min. CLJ"}
-    disp = ft[[c for c in cmap if c in ft.columns]].rename(columns=cmap)
+
+    if sel_card:
+        who = f.loc[f["player_id"] == sel_card, "zawodnik"].iloc[0]
+        cc = st.columns([6, 2])
+        cc[0].success(f"Wybrany zawodnik: **{who}** — analityka i mecze zawężone do niego.")
+        if cc[1].button("← Pokaż wszystkich", use_container_width=True):
+            st.query_params.pop("sel", None)
+            st.rerun()
+        ftab = ft[ft["player_id"] == sel_card]
+        sel_pid = sel_card
+        select_mode = "ignore"
+    else:
+        ftab = ft
+        sel_pid = None
+        select_mode = "rerun"
+
+    disp = ftab[[c for c in cmap if c in ftab.columns]].rename(columns=cmap)
     event = st.dataframe(
         disp, use_container_width=True, height=430, hide_index=True,
-        on_select="rerun", selection_mode="single-row",
+        on_select=select_mode, selection_mode="single-row",
         column_config={
             "PM Index": st.column_config.NumberColumn(format="%.2f", help=PM_HELP),
             "Score (liga)": st.column_config.NumberColumn(format="%.3f",
@@ -937,7 +960,8 @@ def main():
             "Znaczniki": st.column_config.TextColumn(
                 help="↑ gra ze starszymi · 🪑 w kadrze seniorów · ⚽ minuty w seniorach · 🏅 minuty w CLJ")})
 
-    sel_pid = f.iloc[event.selection.rows[0]]["player_id"] if event.selection.rows else None
+    if sel_pid is None and event.selection.rows:
+        sel_pid = ftab.iloc[event.selection.rows[0]]["player_id"]
 
     # ---- MECZE ----
     if sel_pid:
