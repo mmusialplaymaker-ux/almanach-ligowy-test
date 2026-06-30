@@ -504,10 +504,25 @@ def build(_stats, _matches):
     df["Dostępność"] = (df["min_total"] if (QUALITY_SCOPE == "total" or PM_RANK_MODE == "talent")
                         else df["min_play"]).rank(pct=True)
     df["Dyscyplina"] = (-df["kartki_per90"]).rank(pct=True)
+    # --- poprawna "gra ze starszymi": kategoria wiekowa meczu vs własna (z rocznika).
+    #     CLJ U-15=15 (=C1), U-17=17 (=B1), U-19=19 (=A1) — ten sam wiek to NIE "starsi".
+    #     Starsi = wyższa kategoria juniorska niż własna LUB seniorzy. ---
+    mall["_ca"] = _cat_age_series(mall)
+    _by = df.drop_duplicates("player_id").set_index("player_id")["est_birth_year"]
+    own_ca = mall["player_id"].map(2026 - _by)
+    diff = mall["_ca"] - own_ca
+    played = mn_all > 0
+    jun_older = played & mall["_ca"].notna() & (mall["_ca"] <= 19) & (diff >= 1)
+    rwg = diff.where(jun_older).groupby(mall["player_id"]).max()
+    df["roczniki_w_gore"] = df["player_id"].map(rwg)
+    has_jun_older = jun_older.groupby(mall["player_id"]).any()
+    df["_jun_older"] = df["player_id"].map(has_jun_older).fillna(False).astype(bool)
+
     # premia kontekstowa (kolumna „Premia”; w trybie standard wchodzi do PM Index)
     sm = df["senior_minutes"].fillna(0)
     sq = df["senior_squad_apps"].fillna(0)
-    df["PM_premia"] = (df["gra_ze_starszymi"].fillna(False).astype(bool).astype(float) * B_UP
+    df["gra_ze_starszymi"] = (df["_jun_older"] | (sm > 0)).astype(bool)
+    df["PM_premia"] = (df["gra_ze_starszymi"].astype(float) * B_UP
                        + (sm > 0).astype(float) * B_SEN_PLAYED
                        + ((sm == 0) & (sq > 0)).astype(float) * B_SEN_SQUAD)
 
@@ -522,8 +537,6 @@ def build(_stats, _matches):
     df["clj_minutes"] = df["player_id"].map(cljm).fillna(0)
 
     # minuty "2+ roczniki w górę" (duży skok) — sygnał poziomu w trybie talent
-    mall["_ca"] = _cat_age_series(mall)
-    _by = df.drop_duplicates("player_id").set_index("player_id")["est_birth_year"]
     own2 = mall["player_id"].map((2026 - _by) + 2)
     up2_mask = mall["_ca"].notna() & own2.notna() & (mall["_ca"] >= own2) & (mn_all > 0)
     up2 = mn_all.where(up2_mask, 0).groupby(mall["player_id"]).sum()
