@@ -269,10 +269,8 @@ PM_HELP = (
 CSS = """
 <style>
 .pmrow{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;}
-.pmcardlink{text-decoration:none;color:inherit;flex:0 0 232px;display:block;}
-.pmcardlink:hover .pmcard{border-color:#5db0ff;box-shadow:0 0 0 1px #5db0ff55;transform:translateY(-2px);}
-.pmcard{flex:0 0 232px;border:1px solid #2b3340;border-radius:12px;padding:12px 14px;
-        background:#191f29;transition:border-color .12s,box-shadow .12s,transform .12s;cursor:pointer;height:100%;}
+.pmcard{border:1px solid #2b3340;border-radius:12px;padding:12px 14px;width:100%;
+        background:#191f29;height:100%;box-sizing:border-box;}
 .pmcard h4{margin:0 0 2px;font-size:15px;color:#e8edf4;}
 .pmcard .sub{font-size:12px;color:#9aa7b6;margin-bottom:8px;line-height:1.4;min-height:30px;}
 .pmcard .pm{font-size:22px;font-weight:700;color:#5db0ff;}
@@ -621,23 +619,18 @@ def _i(x):
         return 0
 
 
-def cards_html(top):
-    cards = []
-    for _, r in top.iterrows():
-        by = r.get("est_birth_year")
-        age = f"{int(r['_ref_year'] - by)} lat" if pd.notna(by) else "—"
-        rok = f"rocznik {int(by)}" if pd.notna(by) else ""
-        klub = r.get("club_name") or r.get("team_name") or "—"
-        lead = r.get("liga_wiodaca") or r.get("league_name") or "—"
-        cards.append(
-            f'<a class="pmcardlink" href="?sel={r["player_id"]}" target="_self">'
-            f'<div class="pmcard"><h4>{r["zawodnik"]}</h4>'
+def _card_html(r):
+    by = r.get("est_birth_year")
+    age = f"{int(r['_ref_year'] - by)} lat" if pd.notna(by) else "—"
+    rok = f"rocznik {int(by)}" if pd.notna(by) else ""
+    klub = r.get("club_name") or r.get("team_name") or "—"
+    lead = r.get("liga_wiodaca") or r.get("league_name") or "—"
+    return (f'<div class="pmcard"><h4>{r["zawodnik"]}</h4>'
             f'<div class="sub">{klub}<br>liga wiodąca: {lead}</div>'
             f'<div class="pmlbl">PM Index</div><div class="pm">{r["PM_Index"]:.2f}</div>'
             f'<div class="row">{rok} · {age}</div>'
             f'<div class="row">{_i(r.get("min_total"))} min · {_i(r.get("mecze_total"))} meczów (sezon)</div>'
-            f'<div class="badges">{badges_html(r)}</div></div></a>')
-    return '<div class="pmrow">' + "".join(cards) + "</div>"
+            f'<div class="badges">{badges_html(r)}</div></div>')
 
 
 # --------------------------------------------------------------------------- #
@@ -871,10 +864,23 @@ def main():
         f = f[f["clj_minutes"].fillna(0) > 0]
     f = f.sort_values("PM_Index", ascending=False).reset_index(drop=True)
 
-    # ---- KARTY TOPOWYCH (scroll w bok) ----
+    # ---- KARTY TOPOWYCH (siatka, natywny wybór — lekki rerun, bez przeładowania) ----
     st.markdown(f"### 🏅 {L['top_players']}")
     if len(f):
-        st.markdown(cards_html(f.head(15)), unsafe_allow_html=True)
+        topcards = f.head(15).reset_index(drop=True)
+        per_row = 5
+        for i in range(0, len(topcards), per_row):
+            cols = st.columns(per_row)
+            for j in range(per_row):
+                if i + j >= len(topcards):
+                    break
+                r = topcards.iloc[i + j]
+                with cols[j]:
+                    st.markdown(_card_html(r), unsafe_allow_html=True)
+                    if st.button("Wybierz", key=f"card_{r['player_id']}",
+                                 use_container_width=True):
+                        st.session_state["sel_pid"] = r["player_id"]
+                        st.rerun()
     else:
         st.info(L["no_players"])
 
@@ -910,8 +916,8 @@ def main():
         elif (r.get("senior_squad_apps") or 0) > 0: z.append("🪑")
         if (r.get("clj_minutes") or 0) > 0: z.append("🏅")
         return " ".join(z)
-    # wybór z karty (klik ustawia ?sel=player_id)
-    sel_card = st.query_params.get("sel")
+    # wybór z karty (przycisk ustawia st.session_state["sel_pid"] — lekki rerun)
+    sel_card = st.session_state.get("sel_pid")
     sel_card = sel_card if (sel_card and (f["player_id"] == sel_card).any()) else None
 
     ft = f.copy()
@@ -932,7 +938,7 @@ def main():
         cc = st.columns([6, 2])
         cc[0].success(f"Wybrany zawodnik: **{who}** — analityka i mecze zawężone do niego.")
         if cc[1].button("← Pokaż wszystkich", use_container_width=True):
-            st.query_params.pop("sel", None)
+            st.session_state.pop("sel_pid", None)
             st.rerun()
         ftab = ft[ft["player_id"] == sel_card]
         sel_pid = sel_card
