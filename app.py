@@ -183,12 +183,12 @@ def _rank_p_series(df):
 # Młodszy może grać w każdej starszej; "za stary" nie zagra niżej. Gra w dywizji o
 # starszym max-roczniku niż własny = "gra ze starszymi".
 _CAT_MAXYEAR_PATS = [
-    (r'(^A1$|U-?19)', 2006), (r'(^A2$|U-?18)', 2007),
-    (r'(^B1$|U-?17)', 2008), (r'(^B2$|U-?16)', 2009),
-    (r'(^C1$|U-?15)', 2010), (r'(^C2$|U-?14)', 2011),
-    (r'(^D1$|U-?13)', 2012), (r'(^D2$|U-?12)', 2013),
-    (r'(^E1$|U-?11)', 2014), (r'(^E2$|U-?10)', 2015),
-    (r'(^F1$|U-?9)', 2016),  (r'(^F2$|U-?8)', 2017),
+    (r'(^A1$|U-?19)', 2007), (r'(^A2$|U-?18)', 2008),
+    (r'(^B1$|U-?17)', 2009), (r'(^B2$|U-?16)', 2010),
+    (r'(^C1$|U-?15)', 2011), (r'(^C2$|U-?14)', 2012),
+    (r'(^D1$|U-?13)', 2013), (r'(^D2$|U-?12)', 2014),
+    (r'(^E1$|U-?11)', 2015), (r'(^E2$|U-?10)', 2016),
+    (r'(^F1$|U-?9)', 2017),  (r'(^F2$|U-?8)', 2018),
 ]
 
 
@@ -603,13 +603,23 @@ EXPORT_COLS = [("zawodnik", L["player_one"]), ("club_name", "Klub"), ("team_name
                ("status_seniorski", "Status senior")]
 
 
-def export_frame(f, top_n):
+def export_frame(f, top_n, per_region=False):
     cols = [(s, d) for s, d in EXPORT_COLS if s in f.columns]
-    df = f.head(int(top_n))[[s for s, _ in cols]].rename(columns=dict(cols)).copy()
+    f = f.sort_values("PM_Index", ascending=False)
+    if per_region and "region_name" in f.columns:
+        # top N z KAŻDEGO województwa osobno; Lp. numeruje się od nowa w każdym woj.
+        base = (f.groupby("region_name", sort=True, group_keys=False)
+                 .head(int(top_n))
+                 .sort_values(["region_name", "PM_Index"], ascending=[True, False]))
+        lp = list(base.groupby("region_name").cumcount() + 1)
+    else:
+        base = f.head(int(top_n))
+        lp = list(range(1, len(base) + 1))
+    df = base[[s for s, _ in cols]].rename(columns=dict(cols)).copy()
     for c in ["PM Index", "Premia", "Score (liga)"]:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce").round(3)
-    df.insert(0, "Lp.", range(1, len(df) + 1))
+    df.insert(0, "Lp.", lp)
     return df
 
 
@@ -864,7 +874,8 @@ def main():
         f_up = r3[0].checkbox("↑ Gra ze starszymi", key=K("f_up"))
         f_kad = r3[1].checkbox("🪑 W kadrze seniorów", key=K("f_kad"))
         f_sen = r3[2].checkbox("⚽ Minuty w seniorach", key=K("f_sen"))
-        f_clj = r3[3].checkbox("🏅 Minuty w CLJ", key=K("f_clj"))
+        f_clj = r3[3].selectbox("CLJ", ["— wszyscy —", "🏅 tylko z CLJ", "🚫 bez CLJ (nie grał)"],
+                                key=K("f_clj"))
 
     # ---- FILTROWANIE ----
     f = data.copy()
@@ -887,8 +898,10 @@ def main():
         f = f[(f["senior_squad_apps"].fillna(0) > 0) & (f["senior_minutes"].fillna(0) == 0)]
     if f_sen:
         f = f[f["senior_minutes"].fillna(0) > 0]
-    if f_clj:
+    if f_clj == "🏅 tylko z CLJ":
         f = f[f["clj_minutes"].fillna(0) > 0]
+    elif isinstance(f_clj, str) and f_clj.startswith("🚫"):
+        f = f[f["clj_minutes"].fillna(0) == 0]
     f = f.sort_values("PM_Index", ascending=False).reset_index(drop=True)
 
     # ---- KARTY TOPOWYCH (jeden rząd, przewijany w bok; natywny wybór — lekki rerun) ----
@@ -909,25 +922,30 @@ def main():
 
     # ---- TABELA ----
     st.markdown("### 📋 Analityka")
-    ci = st.columns([2, 2, 2, 3])
+    ci = st.columns([2, 2, 2, 2, 3])
     with ci[0].popover("ℹ️ Czym jest PM Index?"):
         st.markdown(PM_HELP)
     with ci[1].popover("🏷️ Znaczniki"):
         st.markdown(BADGE_HELP)
     max_n = max(10, len(f))
-    top_n = ci[2].number_input("Top N do zestawienia", min_value=10, max_value=max_n,
+    top_n = ci[2].number_input("Top N", min_value=10, max_value=max_n,
                                value=min(100, max_n), step=10)
-    exp = export_frame(f, top_n)
+    per_woj = ci[3].checkbox("na każde województwo", key=K("f_perwoj"),
+                             help="Zamiast top N ogółem — top N z KAŻDEGO województwa osobno "
+                                  "(np. top 40 z każdego woj., połączone w jeden plik).")
+    exp = export_frame(f, top_n, per_region=per_woj)
     title = f"Almanach ligowy — {liga}" + (f" — {region_txt}" if region_txt else "")
+    if per_woj:
+        title += f"  ·  top {int(top_n)} / województwo"
     xlsx = build_excel(exp, title)
     if xlsx is not None:
-        ci[3].download_button("⬇️ Pobierz zestawienie (Excel)", xlsx,
+        ci[4].download_button("⬇️ Pobierz zestawienie (Excel)", xlsx,
                               file_name="zestawienie_playmaker.xlsx",
                               mime=("application/vnd.openxmlformats-officedocument."
                                     "spreadsheetml.sheet"),
                               use_container_width=True)
     else:
-        ci[3].download_button("⬇️ Pobierz zestawienie (CSV)",
+        ci[4].download_button("⬇️ Pobierz zestawienie (CSV)",
                               exp.to_csv(index=False).encode("utf-8-sig"),
                               file_name="zestawienie_playmaker.csv", mime="text/csv",
                               use_container_width=True)

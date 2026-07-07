@@ -30,14 +30,14 @@ import pandas as pd
 
 ROK_BAZOWY = 2026  # sezon 25/26 = mapowanie "surowe"
 
-# dywizja -> najstarszy dopuszczalny rocznik (sezon 25/26). CLJ U-1x wg numeru.
+# dywizja -> najstarszy dopuszczalny rocznik (sezon 25/26, wg regulaminu MZPN). CLJ U-1x wg numeru.
 _CAT_MAXYEAR_PATS = [
-    (r'(^A1$|U-?19)', 2006), (r'(^A2$|U-?18)', 2007),
-    (r'(^B1$|U-?17)', 2008), (r'(^B2$|U-?16)', 2009),
-    (r'(^C1$|U-?15)', 2010), (r'(^C2$|U-?14)', 2011),
-    (r'(^D1$|U-?13)', 2012), (r'(^D2$|U-?12)', 2013),
-    (r'(^E1$|U-?11)', 2014), (r'(^E2$|U-?10)', 2015),
-    (r'(^F1$|U-?9)',  2016), (r'(^F2$|U-?8)',  2017),
+    (r'(^A1$|U-?19)', 2007), (r'(^A2$|U-?18)', 2008),
+    (r'(^B1$|U-?17)', 2009), (r'(^B2$|U-?16)', 2010),
+    (r'(^C1$|U-?15)', 2011), (r'(^C2$|U-?14)', 2012),
+    (r'(^D1$|U-?13)', 2013), (r'(^D2$|U-?12)', 2014),
+    (r'(^E1$|U-?11)', 2015), (r'(^E2$|U-?10)', 2016),
+    (r'(^F1$|U-?9)',  2017), (r'(^F2$|U-?8)',  2018),
 ]
 
 # prefiks season_id -> rok konca sezonu
@@ -116,15 +116,13 @@ def main():
         elif date_z is None:
             status, final = "BRAK_DATY", floor
         elif date_z == floor:
-            status, final = "POTWIERDZONY", date_z            # liga przypina dokladnie rocznik
-        elif date_z > floor:
-            status, final = "OK_gra_w_gore", date_z           # normalne (gra wyzej) - data zostaje
-        elif (floor - date_z) >= 3:
-            status, final = "SPRAWDZ_RECZNIE", date_z         # duza roznica = zepsuty rekord, nie zwykly bug
+            status, final = "POTWIERDZONY", floor          # gra wlasna kategorie - rocznik pewny
+        elif abs(date_z - floor) == 1:
+            status, final = "KOREKTA", floor               # o rok obok -> floor wygrywa (bug zrodla)
         else:
-            status, final = "KOREKTA", floor                  # data starsza niz ligi pozwalaja -> popraw
+            status, final = "SPRAWDZ", date_z              # >=2 lata roznicy -> zostaw date, do wgladu
 
-        roznica = (floor - date_z) if (floor is not None and date_z is not None) else None
+        roznica = (date_z - floor) if (floor is not None and date_z is not None) else None
         rows.append({
             "player_id": pid, "zawodnik": nm,
             "rocznik_z_daty": date_z, "rocznik_z_lig": floor,
@@ -141,11 +139,11 @@ def main():
         print(f"  {k}: {v}")
     kor = out[out["status"] == "KOREKTA"]
     if len(kor):
-        print(f"KOREKTY (data starsza niz ligi -> popraw) wg roznicy lat: "
-              f"{kor['roznica_lat'].abs().value_counts().sort_index().to_dict()}")
-    rec = out[out["status"] == "SPRAWDZ_RECZNIE"]
+        print(f"KOREKTY (floor wygrywa, o rok obok) wg kierunku (data-floor): "
+              f"{kor['roznica_lat'].value_counts().sort_index().to_dict()}")
+    rec = out[out["status"] == "SPRAWDZ"]
     if len(rec):
-        print(f"SPRAWDZ_RECZNIE (duza roznica, zepsuty rekord): {len(rec)}")
+        print(f"SPRAWDZ (>=2 lata roznicy, do wgladu): {len(rec)}")
 
 
 if __name__ == "__main__":

@@ -57,6 +57,8 @@ def main():
     ap.add_argument("--matches", default="matches_test.csv")
     ap.add_argument("--tez-sprawdz", dest="tez_sprawdz", action="store_true",
                     help="poprawiaj tez SPRAWDZ_RECZNIE (domyslnie tylko KOREKTA)")
+    ap.add_argument("--reczne", default="reczne_korekty.csv",
+                    help="opcjonalny CSV z recznymi korektami (player_id,rocznik) - MAJA PRIORYTET nad floorem")
     a = ap.parse_args()
 
     for f in (a.status, a.stats, a.matches):
@@ -78,7 +80,22 @@ def main():
     do_fix = st[st["status"].isin(statuses)]
     corr = dict(zip(do_fix["player_id"], do_fix["rocznik_final"].astype(str)))
     orig = dict(zip(st["player_id"], st["rocznik_z_daty"].astype(str)))
-    print(f"Korekty do nalozenia ({', '.join(sorted(statuses))}): {len(corr)} zawodnikow")
+    print(f"Korekty z floora ({', '.join(sorted(statuses))}): {len(corr)} zawodnikow")
+
+    # RECZNE korekty (z feedbacku) - priorytet nad floorem; lapia tez "za mlodo",
+    # ktorego z lig nie da sie wykryc.
+    if os.path.exists(a.reczne):
+        rk = rd(a.reczne)
+        ycol = next((c for c in ("rocznik", "rocznik_final", "est_birth_year", "rok")
+                     if c in rk.columns), None)
+        if "player_id" in rk.columns and ycol:
+            man = dict(zip(rk["player_id"].astype(str), rk[ycol].astype(str)))
+            man = {k: v for k, v in man.items() if str(v).strip()}
+            corr.update(man)  # reczne wygrywaja
+            print(f"Reczne korekty z {a.reczne}: {len(man)} (priorytet nad floorem)")
+        else:
+            print(f"UWAGA: {a.reczne} bez kolumn player_id + rocznik - pomijam.")
+
     if corr:
         przyklady = do_fix.head(6)[["zawodnik", "rocznik_z_daty", "rocznik_final"]]
         for _, r in przyklady.iterrows():
