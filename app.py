@@ -543,10 +543,19 @@ def build(_stats, _matches):
     cljm = clj.groupby("player_id")["minutes"].sum()
     df["clj_minutes"] = df["player_id"].map(cljm).fillna(0)
 
-    # minuty zagrane "w górę" (w starszej dywizji) — sygnał poziomu w trybie talent
-    # minuty "w górę" WAŻONE liczbą roczników skoku: +1 też się liczy (×1),
-    # ale realny skok waży więcej (+2 ×2, +3 ×3). Sygnał poziomu w trybie talent.
-    up_w = (mn_all * (py - mall["_maxy"])).where(jun_older, 0)
+    # minuty w futsalu / halówce (do znacznika "halowiec")
+    _fut = _matches[
+        _matches["league_name"].astype(str).str.contains(r"futsal|PLF|halow", case=False, regex=True, na=False)
+        | _matches["play_name"].astype(str).str.contains(r"futsal|halow", case=False, regex=True, na=False)
+    ]
+    df["futsal_minutes"] = df["player_id"].map(_fut.groupby("player_id")["minutes"].sum()).fillna(0)
+
+    # minuty zagrane "w górę" (w starszej dywizji) — sygnał poziomu w trybie talent.
+    # Skok ważony liczbą roczników, ale z CZAPKĄ (PM_SKOK_CAP, domyślnie 2): granie
+    # +3/+4 (często dziecko wstawione z braku kadry, nie z klasy) nie rakietuje rankingu.
+    _cap = float(_secret("PM_SKOK_CAP", "2") or 2)
+    _yrs = (py - mall["_maxy"]).clip(upper=_cap)
+    up_w = (mn_all * _yrs).where(jun_older, 0)
     up2 = up_w.groupby(mall["player_id"]).sum()
     df["up2_min"] = df["player_id"].map(up2).fillna(0)
 
@@ -876,6 +885,13 @@ def main():
         f_sen = r3[2].checkbox("⚽ Minuty w seniorach", key=K("f_sen"))
         f_clj = r3[3].selectbox("CLJ", ["— wszyscy —", "🏅 tylko z CLJ", "🚫 bez CLJ (nie grał)"],
                                 key=K("f_clj"))
+        gole_prog = int(float(_secret("PM_GOLE_PROG", "50") or 50))
+        pluca_prog = int(float(_secret("PM_PLUCA_PROG", "5000") or 5000))
+        r4 = st.columns(4)
+        f_gole = r4[0].checkbox(f"🎯 >{gole_prog} goli", key=K("f_gole"))
+        f_pluca = r4[1].checkbox(f"🫁 Żelazne płuca (>{pluca_prog}')", key=K("f_pluca"))
+        f_futsal = r4[2].checkbox("🥅 Halowiec (futsal)", key=K("f_futsal"))
+        f_skok2 = r4[3].checkbox("↑↑ Skok 2+ roczniki", key=K("f_skok2"))
 
     # ---- FILTROWANIE ----
     f = data.copy()
@@ -902,6 +918,14 @@ def main():
         f = f[f["clj_minutes"].fillna(0) > 0]
     elif isinstance(f_clj, str) and f_clj.startswith("🚫"):
         f = f[f["clj_minutes"].fillna(0) == 0]
+    if f_gole:
+        f = f[f["gole_total"].fillna(0) > gole_prog]
+    if f_pluca:
+        f = f[f["min_total"].fillna(0) > pluca_prog]
+    if f_futsal:
+        f = f[f["futsal_minutes"].fillna(0) > 0]
+    if f_skok2:
+        f = f[f["roczniki_w_gore"].fillna(0) >= 2]
     f = f.sort_values("PM_Index", ascending=False).reset_index(drop=True)
 
     # ---- KARTY TOPOWYCH (jeden rząd, przewijany w bok; natywny wybór — lekki rerun) ----
