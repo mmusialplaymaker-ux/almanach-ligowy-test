@@ -206,6 +206,18 @@ def _cat_maxyear_series(df):
     return df["league_name"].map(_cat_max_year)
 
 
+def _rozgrywki_key(name):
+    """Kanoniczna nazwa rozgrywek — scala rundy jesień/wiosna, baraże i (RW) tej samej ligi
+    (źródło rozbija je na osobne play_id)."""
+    n = str(name)
+    n = re.sub(r"\s*-?\s*RUNDA\s+\w+", " ", n, flags=re.I)
+    n = re.sub(r"bara[żz]\w*.*", " ", n, flags=re.I)
+    n = re.sub(r"\(RW\)|\[[^\]]*\]|Grupa\s+\S+", " ", n, flags=re.I)
+    n = n.replace('"', " ")
+    n = re.sub(r"\s{2,}", " ", n).strip(" -")
+    return n or str(name)
+
+
 def compute_pm_score(df):
     """Realny PlayMaker Score 2.0 per mecz (ścieżka domyślna). Zwraca pd.Series w skali 0..1."""
     idx = df.index
@@ -1033,6 +1045,26 @@ def main():
 
     if sel_pid is None and event.selection.rows:
         sel_pid = ftab.iloc[event.selection.rows[0]]["player_id"]
+
+    # ---- ROZBICIE NA ROZGRYWKI (dla wybranego zawodnika) ----
+    if sel_pid:
+        who_r = f.loc[f["player_id"] == sel_pid, "zawodnik"].iloc[0]
+        pv = matches[matches["player_id"] == sel_pid].copy()
+        pv["_rozg"] = pv["play_name"].map(_rozgrywki_key)
+        pv["_min"] = pd.to_numeric(pv["minutes"], errors="coerce")
+        pv["_gol"] = pd.to_numeric(pv["goals"], errors="coerce")
+        agg = (pv.groupby(["_rozg", "league_name"])
+                 .agg(Mecze=("match_id", "nunique"), Min=("_min", "sum"), Gole=("_gol", "sum"))
+                 .reset_index())
+        agg["Gole/90"] = (agg["Gole"] / agg["Min"].replace(0, np.nan) * 90).round(2)
+        agg = (agg.rename(columns={"_rozg": "Rozgrywki", "league_name": "Liga"})
+                  .sort_values("Min", ascending=False))
+        for c in ("Min", "Gole"):
+            agg[c] = agg[c].fillna(0).astype(int)
+        st.markdown(f"### 📊 Rozgrywki: {who_r} — mecze / minuty / gole per liga")
+        st.dataframe(agg[["Rozgrywki", "Liga", "Mecze", "Min", "Gole", "Gole/90"]],
+                     use_container_width=True, hide_index=True,
+                     column_config={"Gole/90": st.column_config.NumberColumn(format="%.2f")})
 
     # ---- MECZE ----
     if sel_pid:
