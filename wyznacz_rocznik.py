@@ -117,10 +117,14 @@ def main():
             status, final = "BRAK_DATY", floor
         elif date_z == floor:
             status, final = "POTWIERDZONY", floor          # gra wlasna kategorie - rocznik pewny
-        elif abs(date_z - floor) == 1:
-            status, final = "KOREKTA", floor               # o rok obok -> floor wygrywa (bug zrodla)
+        elif abs(date_z - floor) >= 4:
+            status, final = "SPRAWDZ", date_z              # ogromna roznica -> zepsuty rekord, do wgladu
+        elif date_z < floor:
+            status, final = "KOREKTA", floor               # za stary (niemozliwe wg lig) -> floor wygrywa
+        elif date_z - floor == 1:
+            status, final = "KOREKTA", floor               # o rok za mlody (czesty bug zrodla) -> floor
         else:
-            status, final = "SPRAWDZ", date_z              # >=2 lata roznicy -> zostaw date, do wgladu
+            status, final = "SPRAWDZ", date_z              # 2-3 lata za mlody: bug ALBO gra w gore -> feedback
 
         roznica = (date_z - floor) if (floor is not None and date_z is not None) else None
         rows.append({
@@ -132,7 +136,12 @@ def main():
 
     out = pd.DataFrame(rows).sort_values(["status", "roznica_lat", "zawodnik"],
                                          na_position="last")
-    out.to_csv(a.out, index=False, encoding="utf-8-sig")
+    try:
+        out.to_csv(a.out, index=False, encoding="utf-8-sig")
+    except PermissionError:
+        print(f"\nBLAD: nie moge zapisac {a.out} - plik jest OTWARTY w Excelu/LibreOffice.")
+        print("Zamknij go i uruchom ponownie.")
+        sys.exit(1)
     print(f"Zapisano {a.out}: {len(out)} zawodnikow")
     print("Rozklad statusow:")
     for k, v in out["status"].value_counts().items():
