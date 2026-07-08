@@ -433,8 +433,8 @@ def _attrs(stats):
     sel = stats[stats["in_selected_play"] == True].copy()
     sel["zawodnik"] = (sel["firstname"].fillna("") + " " + sel["lastname"].fillna("")).str.strip()
     cols = ["player_id", "zawodnik", "team_name", "club_name", "league_name", "play_name",
-            "region_name", "est_birth_year", "status_seniorski",
-            "senior_minutes", "senior_squad_apps"]
+            "region_name", "est_birth_year", "rocznik_pewnosc", "rocznik_widelki",
+            "status_seniorski", "senior_minutes", "senior_squad_apps"]
     base = sel[[c for c in cols if c in sel.columns]].drop_duplicates("player_id")
     # "Gra ze starszymi" z CAŁEGO sezonu: czy w DOWOLNYCH rozgrywkach zawodnik grał powyżej
     # dominującego rocznika danej ligi (nie tylko w wybranej). To jest sygnał skautingowy —
@@ -1025,7 +1025,7 @@ def main():
     ft["Znaczniki"] = ft.apply(znaczniki, axis=1)
     cmap = {"Lp": "#", "zawodnik": L["player_one"], "Znaczniki": "Znaczniki", "region_name": "Województwo",
             "team_name": "Drużyna",
-            "club_name": "Klub", "est_birth_year": "Rocznik", "PM_Index": "PM Index",
+            "club_name": "Klub", "est_birth_year": "Rocznik", "rocznik_pewnosc": "Pewność", "PM_Index": "PM Index",
             "PM_premia": "Premia", "pm_score": "Score (liga)", "pm_score_total": "Score (total)",
             "rank_p_avg": "Poziom",
             "min_play": "Min (liga)", "min_total": "Min (total)",

@@ -127,11 +127,23 @@ def main():
             status, final = "SPRAWDZ", date_z              # 2-3 lata za mlody: bug ALBO gra w gore -> feedback
 
         roznica = (date_z - floor) if (floor is not None and date_z is not None) else None
+        if status == "SPRAWDZ" and floor is not None and date_z is not None:
+            widelki = f"{min(floor, date_z)}-{max(floor, date_z)}"
+        else:
+            widelki = str(final) if final is not None else ""
+        pewnosc = {
+            "POTWIERDZONY": "pewny",
+            "KOREKTA": "pewny (z historii)",
+            "SPRAWDZ": f"do weryfikacji ({widelki})",
+            "BRAK_HISTORII": "tylko źródło",
+            "BRAK_DATY": "z historii",
+        }.get(status, "?")
         rows.append({
             "player_id": pid, "zawodnik": nm,
             "rocznik_z_daty": date_z, "rocznik_z_lig": floor,
             "rocznik_final": final, "roznica_lat": roznica,
-            "status": status, "dowod_floor": dowod,
+            "status": status, "pewnosc": pewnosc, "widelki": widelki,
+            "dowod_floor": dowod,
         })
 
     out = pd.DataFrame(rows).sort_values(["status", "roznica_lat", "zawodnik"],

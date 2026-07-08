@@ -36,17 +36,18 @@ def rd(path):
     raise RuntimeError(f"Nie udalo sie wczytac {path}")
 
 
-def patch(df, corr, orig, label):
-    """Podmien est_birth_year wg mapy corr (player_id->rocznik_final); dopisz rocznik_z_daty."""
+def patch(df, corr, orig, pew, wid, label):
+    """Podmien est_birth_year wg mapy corr; dopisz rocznik_z_daty, rocznik_pewnosc, rocznik_widelki."""
     if "player_id" not in df.columns or "est_birth_year" not in df.columns:
         print(f"  {label}: brak player_id/est_birth_year - pomijam")
         return df, 0
     df = df.copy()
     df["player_id"] = df["player_id"].astype(str)
-    # zachowaj oryginal (prawdziwy, z pliku status) w rocznik_z_daty
     df["rocznik_z_daty"] = df["player_id"].map(orig).fillna(df["est_birth_year"])
     mask = df["player_id"].isin(corr)
     df.loc[mask, "est_birth_year"] = df.loc[mask, "player_id"].map(corr)
+    df["rocznik_pewnosc"] = df["player_id"].map(pew).fillna("")
+    df["rocznik_widelki"] = df["player_id"].map(wid).fillna("")
     return df, int(mask.sum())
 
 
@@ -80,18 +81,27 @@ def main():
     do_fix = st[st["status"].isin(statuses)]
     corr = dict(zip(do_fix["player_id"], do_fix["rocznik_final"].astype(str)))
     orig = dict(zip(st["player_id"], st["rocznik_z_daty"].astype(str)))
+    pew = dict(zip(st["player_id"], st["pewnosc"].astype(str))) if "pewnosc" in st.columns else {}
+    wid = dict(zip(st["player_id"], st["widelki"].astype(str))) if "widelki" in st.columns else {}
     print(f"Korekty z floora ({', '.join(sorted(statuses))}): {len(corr)} zawodnikow")
 
     # RECZNE korekty (z feedbacku) - priorytet nad floorem; lapia tez "za mlodo",
     # ktorego z lig nie da sie wykryc.
     if os.path.exists(a.reczne):
-        rk = rd(a.reczne)
+        try:
+            rk = rd(a.reczne)
+        except Exception:
+            rk = pd.read_csv(a.reczne, dtype=str, keep_default_na=False,
+                             sep=None, engine="python", on_bad_lines="skip")
         ycol = next((c for c in ("rocznik", "rocznik_final", "est_birth_year", "rok")
                      if c in rk.columns), None)
         if "player_id" in rk.columns and ycol:
             man = dict(zip(rk["player_id"].astype(str), rk[ycol].astype(str)))
             man = {k: v for k, v in man.items() if str(v).strip()}
             corr.update(man)  # reczne wygrywaja
+            for k, v in man.items():          # feedback = pewny
+                pew[k] = "pewny (feedback)"
+                wid[k] = str(v)
             print(f"Reczne korekty z {a.reczne}: {len(man)} (priorytet nad floorem)")
         else:
             print(f"UWAGA: {a.reczne} bez kolumn player_id + rocznik - pomijam.")
@@ -101,10 +111,16 @@ def main():
         for _, r in przyklady.iterrows():
             print(f"  {r['zawodnik']}: {r['rocznik_z_daty']} -> {r['rocznik_final']}")
 
-    s, ns = patch(rd(a.stats), corr, orig, "stats")
-    m, nm = patch(rd(a.matches), corr, orig, "matches")
-    s.to_csv(a.stats, index=False, encoding="utf-8")
-    m.to_csv(a.matches, index=False, encoding="utf-8")
+    s, ns = patch(rd(a.stats), corr, orig, pew, wid, "stats")
+    m, nm = patch(rd(a.matches), corr, orig, pew, wid, "matches")
+    try:
+        s.to_csv(a.stats, index=False, encoding="utf-8")
+        m.to_csv(a.matches, index=False, encoding="utf-8")
+    except PermissionError as e:
+        f = getattr(e, "filename", "plik")
+        print(f"\nBLAD: nie moge zapisac {f} - jest OTWARTY w Excelu/LibreOffice.")
+        print("Zamknij stats_test.csv i matches_test.csv i uruchom ponownie.")
+        sys.exit(1)
     print(f"Poprawiono wierszy: stats {ns}, matches {nm}")
     print(f"Zapisano: {a.stats}, {a.matches} (est_birth_year skorygowane; oryginal w rocznik_z_daty)")
 
