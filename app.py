@@ -235,6 +235,65 @@ def _liga_rank(league_name, play_name=""):
     return (0, 0)   # seniorzy (ligi/klasy dorosłych) — najwyżej
 
 
+def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
+    """Zwraca bajty PDF 'Zaproszenie na testy' z logo klubu, albo None jeśli brak reportlab."""
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.units import mm
+        from reportlab.lib import colors
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.utils import ImageReader
+    except Exception:
+        return None
+    import datetime as _dt
+    import textwrap as _tw
+    import glob as _glob
+    klub = _secret("PM_KLUB", "OKS Odra Opole")
+    adres = _secret("PM_KLUB_ADRES", "ul. Leonarda Olejnika 1, 45-839 Opole")
+    logo = _secret("PM_KLUB_LOGO", "")
+    if not (logo and os.path.exists(logo)):
+        cand = _glob.glob("logo.*") or _glob.glob("*logo*.*")
+        logo = cand[0] if cand else None
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    W, H = A4
+    y = H - 30 * mm
+    if logo and os.path.exists(logo):
+        try:
+            img = ImageReader(logo); iw, ih = img.getSize()
+            w = 38 * mm; h = w * ih / iw
+            c.drawImage(img, (W - w) / 2, y - h + 10 * mm, width=w, height=h,
+                        preserveAspectRatio=True, mask="auto")
+            y -= h
+        except Exception:
+            pass
+    c.setFont("Helvetica-Bold", 16); c.drawCentredString(W / 2, y, klub); y -= 7 * mm
+    c.setFont("Helvetica", 9); c.drawCentredString(W / 2, y, adres); y -= 6 * mm
+    c.setStrokeColor(colors.HexColor("#c0392b")); c.setLineWidth(1.2)
+    c.line(25 * mm, y, W - 25 * mm, y); y -= 18 * mm
+    c.setFont("Helvetica", 10)
+    c.drawRightString(W - 25 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 16 * mm
+    c.setFont("Helvetica-Bold", 15); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 14 * mm
+    c.setFont("Helvetica", 11); t = c.beginText(25 * mm, y); t.setLeading(16)
+    t.textLine("Szanowni Państwo,"); t.textLine("")
+    linia = (f"{klub} ma przyjemność zaprosić zawodnika {zawodnik}"
+             + (f" (rocznik {rocznik})" if rocznik else "")
+             + (f", {klub_zaw}," if klub_zaw else "")
+             + " na testy do drużyny młodzieżowej naszego klubu.")
+    for w in _tw.wrap(linia, 92):
+        t.textLine(w)
+    t.textLine("")
+    for w in _tw.wrap("Prosimy o potwierdzenie obecności oraz zabranie stroju treningowego, "
+                      "obuwia na nawierzchnię naturalną i sztuczną oraz ochraniaczy.", 92):
+        t.textLine(w)
+    c.drawText(t)
+    c.setFont("Helvetica", 11)
+    c.drawRightString(W - 25 * mm, 45 * mm, "Z wyrazami szacunku,")
+    c.drawRightString(W - 25 * mm, 38 * mm, klub)
+    c.showPage(); c.save(); buf.seek(0)
+    return buf.getvalue()
+
+
 def compute_pm_score(df):
     """Realny PlayMaker Score 2.0 per mecz (ścieżka domyślna). Zwraca pd.Series w skali 0..1."""
     idx = df.index
@@ -1036,11 +1095,18 @@ def main():
 
     if sel_card:
         who = f.loc[f["player_id"] == sel_card, "zawodnik"].iloc[0]
-        cc = st.columns([6, 2])
+        cc = st.columns([5, 2, 2])
         cc[0].success(f"Wybrany zawodnik: **{who}** — analityka i mecze zawężone do niego.")
         if cc[1].button("← Pokaż wszystkich", use_container_width=True):
             st.session_state.pop("sel_pid", None)
             st.rerun()
+        _prow = f.loc[f["player_id"] == sel_card].iloc[0]
+        _pdf = _zaproszenie_pdf(who, str(_prow.get("est_birth_year", "") or "").split(".")[0],
+                                str(_prow.get("club_name", "") or ""))
+        if _pdf:
+            cc[2].download_button("📄 Zaproszenie na testy", _pdf,
+                                  file_name=f"zaproszenie_{who.replace(' ', '_')}.pdf",
+                                  mime="application/pdf", use_container_width=True)
         ftab = ft[ft["player_id"] == sel_card]
         sel_pid = sel_card
         select_mode = "ignore"

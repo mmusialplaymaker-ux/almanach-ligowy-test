@@ -4,3 +4,8 @@ numpy>=1.24
 openpyxl>=3.1
 # tryb produkcyjny (Postgres):
 psycopg2-binary>=2.9
+reportlab
+
+reportlab
+
+reportlab
