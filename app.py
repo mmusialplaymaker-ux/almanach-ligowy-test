@@ -670,6 +670,19 @@ def build(_stats, _matches):
 
     ry = _matches["match_date"].dt.year.max()
     df["_ref_year"] = int(ry) if pd.notna(ry) else 2026
+
+    # lokalizacja / dystans do Opola (opcjonalne, z zawodnicy_lokalizacja.csv)
+    try:
+        _loc = pd.read_csv("zawodnicy_lokalizacja.csv", dtype=str, keep_default_na=False)
+        _loc["player_id"] = _loc["player_id"].astype(str)
+        if "miejscowosc" in _loc.columns:
+            df["miejscowosc"] = df["player_id"].map(dict(zip(_loc["player_id"], _loc["miejscowosc"])))
+        for c in ("lat", "lon", "km_do_opola"):
+            if c in _loc.columns:
+                df[c] = df["player_id"].map(dict(zip(_loc["player_id"],
+                                                      pd.to_numeric(_loc[c], errors="coerce"))))
+    except Exception:
+        pass
     return df
 
 
@@ -985,6 +998,11 @@ def main():
         f_pluca = r4[1].checkbox(f"🫁 Żelazne płuca (>{pluca_prog}')", key=K("f_pluca"))
         f_futsal = r4[2].checkbox("🥅 Halowiec (futsal)", key=K("f_futsal"))
         f_skok2 = r4[3].checkbox("↑↑ Skok 2+ roczniki", key=K("f_skok2"))
+        km_max = 0
+        if "km_do_opola" in data.columns and data["km_do_opola"].notna().any():
+            _hi = int(pd.to_numeric(data["km_do_opola"], errors="coerce").max() or 0)
+            km_max = st.slider("📍 Maks. odległość do Opola (km, 0 = bez filtra)",
+                               0, _hi, 0, step=5, key=K("f_km"))
 
     # ---- FILTROWANIE ----
     f = data.copy()
@@ -1021,6 +1039,8 @@ def main():
         f = f[f["futsal_minutes"].fillna(0) > 0]
     if f_skok2:
         f = f[f["roczniki_w_gore"].fillna(0) >= 2]
+    if km_max and "km_do_opola" in f.columns:
+        f = f[f["km_do_opola"].notna() & (f["km_do_opola"] <= km_max)]
     f = f.sort_values("PM_Index", ascending=False).reset_index(drop=True)
 
     # ---- KARTY TOPOWYCH (jeden rząd, przewijany w bok; natywny wybór — lekki rerun) ----
@@ -1084,7 +1104,8 @@ def main():
     ft["Znaczniki"] = ft.apply(znaczniki, axis=1)
     cmap = {"Lp": "#", "zawodnik": L["player_one"], "Znaczniki": "Znaczniki", "region_name": "Województwo",
             "team_name": "Drużyna",
-            "club_name": "Klub", "est_birth_year": "Rocznik", "rocznik_pewnosc": "Pewność", "PM_Index": "PM Index",
+            "club_name": "Klub", "est_birth_year": "Rocznik", "rocznik_pewnosc": "Pewność",
+            "miejscowosc": "Miejscowość", "km_do_opola": "~km do Opola", "PM_Index": "PM Index",
             "PM_premia": "Premia", "pm_score": "Score (liga)", "pm_score_total": "Score (total)",
             "rank_p_avg": "Poziom",
             "min_play": "Min (liga)", "min_total": "Min (total)",
@@ -1189,6 +1210,27 @@ def main():
                [[c for c in mc if c in mm.columns]].rename(columns=mc))
     st.dataframe(mshow, use_container_width=True, height=285, hide_index=True,
                  column_config={"Score": st.column_config.NumberColumn(format="%.3f")})
+
+    # ---- MAPA: odległość do Opola ----
+    if "lat" in f.columns and f["lat"].notna().any():
+        st.markdown("### 🗺️ Mapa — odległość do Opola")
+        mp = f[f["lat"].notna() & f["lon"].notna()].copy()
+        st.caption(f"{mp['player_id'].nunique()} zawodników z lokalizacją "
+                   f"(czerwony punkt = Opole, cel testów).")
+        pts = mp[["lat", "lon"]].rename(columns={"lat": "latitude", "lon": "longitude"})
+        pts["color"] = "#1f77b4"
+        opole = pd.DataFrame([{"latitude": 50.6751, "longitude": 17.9213, "color": "#d62728"}])
+        try:
+            import pydeck as pdk
+            layer_p = pdk.Layer("ScatterplotLayer", data=pts, get_position="[longitude, latitude]",
+                                get_fill_color="[31, 119, 180, 160]", get_radius=2500, pickable=False)
+            layer_o = pdk.Layer("ScatterplotLayer", data=opole, get_position="[longitude, latitude]",
+                                get_fill_color="[214, 39, 40, 220]", get_radius=5000)
+            st.pydeck_chart(pdk.Deck(layers=[layer_p, layer_o],
+                                     initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7),
+                                     map_style=None))
+        except Exception:
+            st.map(pd.concat([pts[["latitude", "longitude"]], opole[["latitude", "longitude"]]]))
 
 
 if __name__ == "__main__":
