@@ -1046,25 +1046,35 @@ def main():
     if sel_pid is None and event.selection.rows:
         sel_pid = ftab.iloc[event.selection.rows[0]]["player_id"]
 
-    # ---- ROZBICIE NA ROZGRYWKI (dla wybranego zawodnika) ----
+    # ---- PODSUMOWANIE SEZONU (per rozgrywki) — zawsze widoczne, jak mecze ----
     if sel_pid:
         who_r = f.loc[f["player_id"] == sel_pid, "zawodnik"].iloc[0]
+        st.markdown(f"### 📊 Podsumowanie sezonu: {who_r} — mecze / minuty / gole per liga")
         pv = matches[matches["player_id"] == sel_pid].copy()
-        pv["_rozg"] = pv["play_name"].map(_rozgrywki_key)
-        pv["_min"] = pd.to_numeric(pv["minutes"], errors="coerce")
-        pv["_gol"] = pd.to_numeric(pv["goals"], errors="coerce")
-        agg = (pv.groupby(["_rozg", "league_name"])
-                 .agg(Mecze=("match_id", "nunique"), Min=("_min", "sum"), Gole=("_gol", "sum"))
-                 .reset_index())
-        agg["Gole/90"] = (agg["Gole"] / agg["Min"].replace(0, np.nan) * 90).round(2)
-        agg = (agg.rename(columns={"_rozg": "Rozgrywki", "league_name": "Liga"})
-                  .sort_values("Min", ascending=False))
-        for c in ("Min", "Gole"):
-            agg[c] = agg[c].fillna(0).astype(int)
-        st.markdown(f"### 📊 Rozgrywki: {who_r} — mecze / minuty / gole per liga")
-        st.dataframe(agg[["Rozgrywki", "Liga", "Mecze", "Min", "Gole", "Gole/90"]],
-                     use_container_width=True, hide_index=True,
-                     column_config={"Gole/90": st.column_config.NumberColumn(format="%.2f")})
+    else:
+        st.markdown(f"### 📊 Podsumowanie sezonu ({len(f)} {L['players_gen']}) — "
+                    f"{L['click_one']} wyżej, by zawęzić")
+        pv = matches[matches["player_id"].isin(f["player_id"])].copy()
+    pv["_rozg"] = pv["play_name"].map(_rozgrywki_key)
+    pv["_min"] = pd.to_numeric(pv["minutes"], errors="coerce")
+    pv["_gol"] = pd.to_numeric(pv["goals"], errors="coerce")
+    _gcols = (["player_id"] if not sel_pid else []) + ["_rozg", "league_name"]
+    agg = (pv.groupby(_gcols)
+             .agg(Mecze=("match_id", "nunique"), Min=("_min", "sum"), Gole=("_gol", "sum"))
+             .reset_index())
+    agg["Gole/90"] = (agg["Gole"] / agg["Min"].replace(0, np.nan) * 90).round(2)
+    for c in ("Min", "Gole"):
+        agg[c] = agg[c].fillna(0).astype(int)
+    agg = agg.rename(columns={"_rozg": "Rozgrywki", "league_name": "Liga"})
+    if not sel_pid:
+        agg["Zawodnik"] = agg["player_id"].map(f.set_index("player_id")["zawodnik"])
+        agg = agg.sort_values(["Zawodnik", "Min"], ascending=[True, False])
+        _scols = ["Zawodnik", "Rozgrywki", "Liga", "Mecze", "Min", "Gole", "Gole/90"]
+    else:
+        agg = agg.sort_values("Min", ascending=False)
+        _scols = ["Rozgrywki", "Liga", "Mecze", "Min", "Gole", "Gole/90"]
+    st.dataframe(agg[_scols], use_container_width=True, height=360, hide_index=True,
+                 column_config={"Gole/90": st.column_config.NumberColumn(format="%.2f")})
 
     # ---- MECZE ----
     if sel_pid:
