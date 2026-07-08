@@ -218,6 +218,23 @@ def _rozgrywki_key(name):
     return n or str(name)
 
 
+_JR_ORDER = {"A1": 0, "A2": 1, "B1": 2, "B2": 3, "C1": 4, "C2": 5,
+             "D1": 6, "D2": 7, "E1": 8, "E2": 9, "F1": 10, "F2": 11}
+
+
+def _liga_rank(league_name, play_name=""):
+    """Priorytet wyświetlania lig: seniorzy -> CLJ -> juniorskie wojewódzkie
+    (starsze->młodsze) -> okręgowe/niższe. Zwraca krotkę do sortowania."""
+    ln = str(league_name).strip().upper()
+    s = f"{league_name} {play_name}".lower()
+    if re.search(r"clj|centralna liga", s):
+        return (1, 0)
+    if ln in _JR_ORDER or re.search(r"junior|trampkarz|m[lł]odzik|orlik|[zż]ak|skrzat|u-1", s):
+        base = 3 if re.search(r"okręg|klasa", s) else 2
+        return (base, _JR_ORDER.get(ln, 5))
+    return (0, 0)   # seniorzy (ligi/klasy dorosłych) — najwyżej
+
+
 def compute_pm_score(df):
     """Realny PlayMaker Score 2.0 per mecz (ścieżka domyślna). Zwraca pd.Series w skali 0..1."""
     idx = df.index
@@ -907,6 +924,8 @@ def main():
 
     # ---- FILTROWANIE ----
     f = data.copy()
+    f = f.sort_values("PM_Index", ascending=False).reset_index(drop=True)
+    f["Lp"] = range(1, len(f) + 1)          # globalne miejsce w rankingu (przed filtrami)
     if f_reg:
         f = f[f["region_name"].isin(f_reg)]
     if q:
@@ -999,7 +1018,7 @@ def main():
 
     ft = f.copy()
     ft["Znaczniki"] = ft.apply(znaczniki, axis=1)
-    cmap = {"zawodnik": L["player_one"], "Znaczniki": "Znaczniki", "region_name": "Województwo",
+    cmap = {"Lp": "#", "zawodnik": L["player_one"], "Znaczniki": "Znaczniki", "region_name": "Województwo",
             "team_name": "Drużyna",
             "club_name": "Klub", "est_birth_year": "Rocznik", "PM_Index": "PM Index",
             "PM_premia": "Premia", "pm_score": "Score (liga)", "pm_score_total": "Score (total)",
@@ -1027,7 +1046,7 @@ def main():
 
     disp = ftab[[c for c in cmap if c in ftab.columns]].rename(columns=cmap)
     event = st.dataframe(
-        disp, use_container_width=True, height=430, hide_index=True,
+        disp, use_container_width=True, height=285, hide_index=True,
         on_select=select_mode, selection_mode="single-row",
         column_config={
             "PM Index": st.column_config.NumberColumn(format="%.2f", help=PM_HELP),
@@ -1066,14 +1085,18 @@ def main():
     for c in ("Min", "Gole"):
         agg[c] = agg[c].fillna(0).astype(int)
     agg = agg.rename(columns={"_rozg": "Rozgrywki", "league_name": "Liga"})
+    _lr = [_liga_rank(l, r) for l, r in zip(agg["Liga"], agg["Rozgrywki"])]
+    agg["_lr0"] = [x[0] for x in _lr]
+    agg["_lr1"] = [x[1] for x in _lr]
     if not sel_pid:
         agg["Zawodnik"] = agg["player_id"].map(f.set_index("player_id")["zawodnik"])
-        agg = agg.sort_values(["Zawodnik", "Min"], ascending=[True, False])
+        agg = agg.sort_values(["Zawodnik", "_lr0", "_lr1", "Min"],
+                              ascending=[True, True, True, False])
         _scols = ["Zawodnik", "Rozgrywki", "Liga", "Mecze", "Min", "Gole", "Gole/90"]
     else:
-        agg = agg.sort_values("Min", ascending=False)
+        agg = agg.sort_values(["_lr0", "_lr1", "Min"], ascending=[True, True, False])
         _scols = ["Rozgrywki", "Liga", "Mecze", "Min", "Gole", "Gole/90"]
-    st.dataframe(agg[_scols], use_container_width=True, height=360, hide_index=True,
+    st.dataframe(agg[_scols], use_container_width=True, height=215, hide_index=True,
                  column_config={"Gole/90": st.column_config.NumberColumn(format="%.2f")})
 
     # ---- MECZE ----
@@ -1093,7 +1116,7 @@ def main():
           "status_seniorski": "Status senior"}
     mshow = (mm.sort_values("match_date", ascending=False)
                [[c for c in mc if c in mm.columns]].rename(columns=mc))
-    st.dataframe(mshow, use_container_width=True, height=360, hide_index=True,
+    st.dataframe(mshow, use_container_width=True, height=285, hide_index=True,
                  column_config={"Score": st.column_config.NumberColumn(format="%.3f")})
 
 
