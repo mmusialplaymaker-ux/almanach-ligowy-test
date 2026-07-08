@@ -545,7 +545,12 @@ def build(_stats, _matches):
     mall["_maxy"] = _cat_maxyear_series(mall)
     _by = df.drop_duplicates("player_id").set_index("player_id")["est_birth_year"]
     py = mall["player_id"].map(_by)                      # rocznik zawodnika (per mecz)
-    played = mn_all > 0
+    # "zagrał" = ma minuty LUB dowód występu (gol/kartka) — źródło czasem gubi minuty
+    # (np. Oskar: 0 min w C1, ale 2 gole → oczywiście zagrał). Znacznik "w górę" ma to łapać.
+    _gg = pd.to_numeric(mall.get("goals"), errors="coerce").fillna(0)
+    _yc = pd.to_numeric(mall.get("yellow_cards"), errors="coerce").fillna(0)
+    _rc = pd.to_numeric(mall.get("red_cards"), errors="coerce").fillna(0)
+    played = (mn_all > 0) | (_gg > 0) | (_yc > 0) | (_rc > 0)
     jun_older = played & mall["_maxy"].notna() & py.notna() & (py > mall["_maxy"])
     nyrs = (py - mall["_maxy"]).where(jun_older)         # o ile roczników wyżej
     rwg = nyrs.groupby(mall["player_id"]).max()
