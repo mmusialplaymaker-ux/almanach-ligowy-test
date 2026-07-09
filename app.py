@@ -677,6 +677,8 @@ def build(_stats, _matches):
         _loc["player_id"] = _loc["player_id"].astype(str)
         if "miejscowosc" in _loc.columns:
             df["miejscowosc"] = df["player_id"].map(dict(zip(_loc["player_id"], _loc["miejscowosc"])))
+        if "spoza_regionu" in _loc.columns:
+            df["spoza_regionu"] = df["player_id"].map(dict(zip(_loc["player_id"], _loc["spoza_regionu"])))
         for c in ("lat", "lon", "km_do_opola"):
             if c in _loc.columns:
                 df[c] = df["player_id"].map(dict(zip(_loc["player_id"],
@@ -1215,22 +1217,42 @@ def main():
     if "lat" in f.columns and f["lat"].notna().any():
         st.markdown("### 🗺️ Mapa — odległość do Opola")
         mp = f[f["lat"].notna() & f["lon"].notna()].copy()
-        st.caption(f"{mp['player_id'].nunique()} zawodników z lokalizacją "
-                   f"(czerwony punkt = Opole, cel testów).")
-        pts = mp[["lat", "lon"]].rename(columns={"lat": "latitude", "lon": "longitude"})
-        pts["color"] = "#1f77b4"
-        opole = pd.DataFrame([{"latitude": 50.6751, "longitude": 17.9213, "color": "#d62728"}])
+        if "spoza_regionu" not in mp.columns:
+            mp["spoza_regionu"] = False
+        mp["spoza_regionu"] = mp["spoza_regionu"].astype(str).str.lower().isin(["true", "1", "tak"])
+        # skupiska: 1 punkt na miejscowość, promień ~ liczba zawodników
+        grp = (mp.groupby(["miejscowosc", "lat", "lon"], dropna=False)
+                 .agg(zawodnikow=("player_id", "nunique"),
+                      km=("km_do_opola", "min"),
+                      spoza=("spoza_regionu", "max"))
+                 .reset_index())
+        n_sp = int(grp["spoza"].sum())
+        st.caption(f"{int(grp['zawodnikow'].sum())} zawodników w {len(grp)} miejscowościach. "
+                   f"🔵 w regionie · 🟠 spoza regionu ({n_sp}) · 🔴 Opole (cel). "
+                   f"Wielkość kropki = liczba zawodników.")
         try:
             import pydeck as pdk
-            layer_p = pdk.Layer("ScatterplotLayer", data=pts, get_position="[longitude, latitude]",
-                                get_fill_color="[31, 119, 180, 160]", get_radius=2500, pickable=False)
-            layer_o = pdk.Layer("ScatterplotLayer", data=opole, get_position="[longitude, latitude]",
-                                get_fill_color="[214, 39, 40, 220]", get_radius=5000)
-            st.pydeck_chart(pdk.Deck(layers=[layer_p, layer_o],
-                                     initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7),
-                                     map_style=None))
+            grp["radius"] = 2000 + grp["zawodnikow"] ** 0.5 * 2200
+            grp["color"] = grp["spoza"].map(lambda s: [255, 140, 0, 180] if s else [31, 119, 180, 170])
+            opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "miejscowosc": "OPOLE (cel)",
+                                   "zawodnikow": 0, "radius": 4000}])
+            l_pts = pdk.Layer("ScatterplotLayer", data=grp, get_position="[lon, lat]",
+                              get_fill_color="color", get_radius="radius", pickable=True)
+            l_op = pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
+                             get_fill_color="[214, 39, 40, 230]", get_radius="radius")
+            st.pydeck_chart(pdk.Deck(
+                layers=[l_pts, l_op],
+                initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.2),
+                tooltip={"text": "{miejscowosc}\n{zawodnikow} zawodników\n~{km} km do Opola"},
+                map_style=None))
         except Exception:
-            st.map(pd.concat([pts[["latitude", "longitude"]], opole[["latitude", "longitude"]]]))
+            st.map(grp.rename(columns={"lat": "latitude", "lon": "longitude"})[["latitude", "longitude"]])
+        with st.expander("📍 Skupiska zawodników wg miejscowości"):
+            _t = grp.sort_values("zawodnikow", ascending=False).rename(
+                columns={"miejscowosc": "Miejscowość", "zawodnikow": "Zawodników", "km": "~km do Opola"})
+            _t["Region"] = _t["spoza"].map(lambda s: "spoza" if s else "opolskie")
+            st.dataframe(_t[["Miejscowość", "Zawodników", "~km do Opola", "Region"]],
+                         use_container_width=True, hide_index=True, height=250)
 
 
 if __name__ == "__main__":
