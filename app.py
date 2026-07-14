@@ -242,7 +242,8 @@ def _pl_font():
         from reportlab.pdfbase.ttfonts import TTFont
         if "PL" in pdfmetrics.getRegisteredFontNames():
             return ("PL", "PL-Bold")
-        cands = ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        cands = ["DejaVuSans.ttf", "fonts/DejaVuSans.ttf",
+                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
                  "/usr/share/fonts/dejavu/DejaVuSans.ttf"]
         try:
             import matplotlib
@@ -1424,9 +1425,6 @@ def main():
             grp["b"] = grp["zawodnikow"].map(_bucket)
             grp["color"] = grp["b"].map(_BCOL)
             grp["px"] = grp["b"].map(_BPX)
-            # obrys pomarańczowy dla miejscowości spoza regionu (fill dalej = kolor liczby)
-            grp["line"] = grp["spoza"].map(lambda s: [255, 140, 0] if s else [255, 255, 255])
-            grp["lw"] = grp["spoza"].map(lambda s: 3 if s else 1)
             opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "opis": "OPOLE — cel testów"}])
             layers = []
             for b, sub in grp.groupby("b"):     # osobna warstwa na koszyk = stały rozmiar w px
@@ -1435,7 +1433,7 @@ def main():
                     "ScatterplotLayer", data=sub, get_position="[lon, lat]",
                     get_fill_color="color", get_radius=px * 120,
                     radius_min_pixels=px, radius_max_pixels=px, pickable=True, stroked=True,
-                    get_line_color="line", get_line_width="lw", line_width_min_pixels=1))
+                    get_line_color=[255, 255, 255], line_width_min_pixels=1))
             layers.append(pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
                                     get_fill_color="[33, 33, 33, 255]", get_radius=1600,
                                     radius_min_pixels=9, radius_max_pixels=9, pickable=True,
@@ -1445,8 +1443,8 @@ def main():
                 initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.5),
                 tooltip={"text": "{opis}"},
                 map_style=None))
-            st.caption("🟢 dużo · 🟡 średnio · 🔴 mało zawodników · ⬛ Opole (cel) · "
-                       "pomarańczowy obwód = miejscowość spoza regionu.")
+            st.caption("Kolor i wielkość kropki = liczba zawodników: 🟢 dużo · 🟡 średnio · 🔴 mało. "
+                       "⬛ Opole (cel). Miejscowości spoza regionu opisane w tooltipie i tabeli poniżej.")
         except Exception:
             st.map(grp.rename(columns={"lat": "latitude", "lon": "longitude"})[["latitude", "longitude"]])
         with st.expander("📍 Skupiska zawodników wg miejscowości"):
