@@ -235,6 +235,32 @@ def _liga_rank(league_name, play_name=""):
     return (0, 0)   # seniorzy (ligi/klasy dorosłych) — najwyżej
 
 
+def _pl_font():
+    """Rejestruje DejaVuSans (polskie znaki) w reportlab. Zwraca (regular, bold)."""
+    try:
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        if "PL" in pdfmetrics.getRegisteredFontNames():
+            return ("PL", "PL-Bold")
+        cands = ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                 "/usr/share/fonts/dejavu/DejaVuSans.ttf"]
+        try:
+            import matplotlib
+            cands.append(os.path.join(os.path.dirname(matplotlib.__file__),
+                                      "mpl-data/fonts/ttf/DejaVuSans.ttf"))
+        except Exception:
+            pass
+        reg = next((p for p in cands if os.path.exists(p)), None)
+        if not reg:
+            return (F, FB)
+        bold = reg.replace("DejaVuSans.ttf", "DejaVuSans-Bold.ttf")
+        pdfmetrics.registerFont(TTFont("PL", reg))
+        pdfmetrics.registerFont(TTFont("PL-Bold", bold if os.path.exists(bold) else reg))
+        return ("PL", "PL-Bold")
+    except Exception:
+        return (F, FB)
+
+
 def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
     """Zwraca bajty PDF 'Zaproszenie na testy' z logo klubu, albo None jeśli brak reportlab."""
     try:
@@ -248,6 +274,7 @@ def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
     import datetime as _dt
     import textwrap as _tw
     import glob as _glob
+    F, FB = _pl_font()
     klub = _secret("PM_KLUB", "OKS Odra Opole")
     adres = _secret("PM_KLUB_ADRES", "ul. Leonarda Olejnika 1, 45-839 Opole")
     logo = _secret("PM_KLUB_LOGO", "")
@@ -267,14 +294,14 @@ def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
             y -= h
         except Exception:
             pass
-    c.setFont("Helvetica-Bold", 16); c.drawCentredString(W / 2, y, klub); y -= 7 * mm
-    c.setFont("Helvetica", 9); c.drawCentredString(W / 2, y, adres); y -= 6 * mm
+    c.setFont(FB, 16); c.drawCentredString(W / 2, y, klub); y -= 7 * mm
+    c.setFont(F, 9); c.drawCentredString(W / 2, y, adres); y -= 6 * mm
     c.setStrokeColor(colors.HexColor("#c0392b")); c.setLineWidth(1.2)
     c.line(25 * mm, y, W - 25 * mm, y); y -= 18 * mm
-    c.setFont("Helvetica", 10)
+    c.setFont(F, 10)
     c.drawRightString(W - 25 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 16 * mm
-    c.setFont("Helvetica-Bold", 15); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 14 * mm
-    c.setFont("Helvetica", 11); t = c.beginText(25 * mm, y); t.setLeading(16)
+    c.setFont(FB, 15); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 14 * mm
+    c.setFont(F, 11); t = c.beginText(25 * mm, y); t.setLeading(16)
     t.textLine("Szanowni Państwo,"); t.textLine("")
     linia = (f"{klub} ma przyjemność zaprosić zawodnika {zawodnik}"
              + (f" (rocznik {rocznik})" if rocznik else "")
@@ -287,7 +314,7 @@ def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
                       "obuwia na nawierzchnię naturalną i sztuczną oraz ochraniaczy.", 92):
         t.textLine(w)
     c.drawText(t)
-    c.setFont("Helvetica", 11)
+    c.setFont(F, 11)
     c.drawRightString(W - 25 * mm, 45 * mm, "Z wyrazami szacunku,")
     c.drawRightString(W - 25 * mm, 38 * mm, klub)
     c.showPage(); c.save(); buf.seek(0)
@@ -305,6 +332,7 @@ def _zaproszenie_klub_pdf(klub_docelowy, zawodnicy, data="", miejsce="", czas=""
     except Exception:
         return None
     import datetime as _dt, textwrap as _tw, glob as _glob
+    F, FB = _pl_font()
     nasz = _secret("PM_KLUB", "OKS Odra Opole")
     adres = _secret("PM_KLUB_ADRES", "ul. Leonarda Olejnika 1, 45-839 Opole")
     logo = _secret("PM_KLUB_LOGO", "")
@@ -320,26 +348,26 @@ def _zaproszenie_klub_pdf(klub_docelowy, zawodnicy, data="", miejsce="", czas=""
             y -= h
         except Exception:
             pass
-    c.setFont("Helvetica-Bold", 15); c.drawCentredString(W / 2, y, nasz); y -= 6 * mm
-    c.setFont("Helvetica", 9); c.drawCentredString(W / 2, y, adres); y -= 5 * mm
+    c.setFont(FB, 15); c.drawCentredString(W / 2, y, nasz); y -= 6 * mm
+    c.setFont(F, 9); c.drawCentredString(W / 2, y, adres); y -= 5 * mm
     c.setStrokeColor(colors.HexColor("#c0392b")); c.setLineWidth(1.1); c.line(22 * mm, y, W - 22 * mm, y); y -= 12 * mm
-    c.setFont("Helvetica", 10); c.drawRightString(W - 22 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 12 * mm
-    c.setFont("Helvetica-Bold", 13); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 10 * mm
-    c.setFont("Helvetica", 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
+    c.setFont(F, 10); c.drawRightString(W - 22 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 12 * mm
+    c.setFont(FB, 13); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 10 * mm
+    c.setFont(F, 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
     intro = (f"{nasz} zaprasza na testy do drużyny młodzieżowej następujących zawodników "
              f"z klubu {klub_docelowy}:")
     for w in _tw.wrap(intro, 95):
         t.textLine(w)
     t.textLine("")
     c.drawText(t); y = t.getY()
-    c.setFont("Helvetica", 10.5)
+    c.setFont(F, 10.5)
     for i, (nm, rok) in enumerate(zawodnicy, 1):
         c.drawString(26 * mm, y, f"{i}. {nm}" + (f"  (rocznik {rok})" if rok else ""))
         y -= 6 * mm
         if y < 45 * mm:
-            c.showPage(); y = H - 25 * mm; c.setFont("Helvetica", 10.5)
+            c.showPage(); y = H - 25 * mm; c.setFont(F, 10.5)
     y -= 6 * mm
-    c.setFont("Helvetica", 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
+    c.setFont(F, 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
     if data or miejsce or czas:
         t.textLine("Termin i miejsce:")
         if data:    t.textLine(f"  Data: {data}")
@@ -354,7 +382,7 @@ def _zaproszenie_klub_pdf(klub_docelowy, zawodnicy, data="", miejsce="", czas=""
                       "obuwie na nawierzchnię naturalną i sztuczną oraz ochraniacze.", 95):
         t.textLine(w)
     c.drawText(t)
-    c.setFont("Helvetica", 10.5); c.drawRightString(W - 22 * mm, 32 * mm, "Z wyrazami szacunku,")
+    c.setFont(F, 10.5); c.drawRightString(W - 22 * mm, 32 * mm, "Z wyrazami szacunku,")
     c.drawRightString(W - 22 * mm, 26 * mm, nasz)
     c.showPage(); c.save(); buf.seek(0)
     return buf.getvalue()
@@ -1047,9 +1075,9 @@ def main():
     _fn = st.session_state.get("_filter_nonce", 0)
     def K(base):
         return f"{base}_{_fn}"
-    with st.container(border=True):
+    with st.expander("🔧 Filtry — kliknij, aby zwinąć/rozwinąć", expanded=True):
         ch = st.columns([6, 1])
-        ch[0].markdown("**Filtry**")
+        ch[0].markdown("**Ustaw filtry składu**")
         if ch[1].button("🧹 Wyczyść filtry", use_container_width=True, type="primary"):
             st.session_state["_filter_nonce"] = _fn + 1
             st.rerun()
@@ -1368,35 +1396,34 @@ def main():
         grp = (mp.groupby(["miejscowosc", "lat", "lon"], dropna=False)
                  .agg(zawodnikow=("player_id", "nunique"),
                       km=("km_do_opola", "min"),
-                      spoza=("spoza_regionu", "max"))
+                      spoza=("spoza_regionu", "mean"))       # udział spoza w miejscowości
                  .reset_index())
+        grp["spoza"] = grp["spoza"] > 0.5                    # spoza tylko gdy WIĘKSZOŚĆ spoza
+        grp["km"] = pd.to_numeric(grp["km"], errors="coerce").fillna(0).round().astype(int)
         n_sp = int(grp["spoza"].sum())
         st.caption(f"{int(grp['zawodnikow'].sum())} zawodników w {len(grp)} miejscowościach. "
                    f"🔵 w regionie · 🟠 spoza regionu ({n_sp}) · 🔴 Opole (cel). "
-                   f"Wielkość kropki = liczba zawodników.")
+                   f"Wielkość kropki ∝ liczba zawodników (max = {int(grp['zawodnikow'].max())}).")
         try:
             import pydeck as pdk
             _mx = max(int(grp["zawodnikow"].max()), 1)
-            def _col(row):
-                if row["spoza"]:
-                    return [255, 140, 0, 200]           # spoza regionu = pomarańczowy
-                inten = row["zawodnikow"] / _mx          # gęstość -> intensywność (jasny->ciemny niebieski)
-                return [max(40, int(150 - 110 * inten)), max(90, int(190 - 120 * inten)), 230, 210]
-            grp["color"] = grp.apply(_col, axis=1)
-            grp["radius"] = 1300                          # stała, mała kropka — nie nachodzą
-            opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "miejscowosc": "OPOLE (cel)",
-                                   "zawodnikow": 0}])
+            grp["color"] = grp["spoza"].map(lambda s: [255, 140, 0, 210] if s else [21, 101, 192, 210])
+            # promień proporcjonalny do udziału względem max (√ dla łagodności), w metrach
+            grp["radius"] = 1500 + (grp["zawodnikow"] / _mx) ** 0.5 * 11000
+            grp["opis"] = grp["miejscowosc"].astype(str) + " — " + grp["zawodnikow"].astype(str) + " zawodn., ~" + grp["km"].astype(str) + " km"
+            opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "radius": 3500,
+                                   "opis": "OPOLE — cel testów"}])
             l_pts = pdk.Layer("ScatterplotLayer", data=grp, get_position="[lon, lat]",
                               get_fill_color="color", get_radius="radius",
-                              radius_min_pixels=4, radius_max_pixels=14, pickable=True, stroked=True,
+                              radius_min_pixels=4, radius_max_pixels=40, pickable=True, stroked=True,
                               get_line_color=[255, 255, 255], line_width_min_pixels=1)
             l_op = pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
-                             get_fill_color="[214, 39, 40, 240]", get_radius=2600,
-                             radius_min_pixels=7, radius_max_pixels=18)
+                             get_fill_color="[214, 39, 40, 245]", get_radius="radius",
+                             radius_min_pixels=8, radius_max_pixels=16, pickable=True)
             st.pydeck_chart(pdk.Deck(
                 layers=[l_pts, l_op],
                 initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.4),
-                tooltip={"text": "{miejscowosc}\n{zawodnikow} zawodników\n~{km} km do Opola"},
+                tooltip={"text": "{opis}"},
                 map_style=None))
         except Exception:
             st.map(grp.rename(columns={"lat": "latitude", "lon": "longitude"})[["latitude", "longitude"]])

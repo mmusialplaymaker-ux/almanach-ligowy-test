@@ -75,18 +75,22 @@ def krok_miejscowosci(a):
     has_reg = "region_name" in m.columns
     if has_reg:
         m["_reg"] = m["region_name"].astype(str).str.strip().str.lower()
+        team_region = m.groupby("team_id")["_reg"].agg(
+            lambda s: s[s.isin(["", "null"]) == False].mode().iloc[0]
+            if len(s[s.isin(["", "null"]) == False].mode()) else "")
 
     rows = []
     for pid, g in m.groupby("player_id"):
-        # 1) preferuj klub z NAJWIEKSZA liczba minut w regionie docelowym
+        # klub domowy = najwiecej minut w regionie docelowym; jak brak -> najwiecej minut ogolem
         gg = g[g["_reg"] == reg] if has_reg else g.iloc[0:0]
-        spoza = False
         if not len(gg) or gg["_min"].sum() == 0:
-            gg, spoza = g, True          # brak gry w regionie -> klub spoza regionu
+            gg = g
         team = gg.groupby("team_id")["_min"].sum().idxmax()
+        # spoza = region KLUBU DOMOWEGO != docelowy (a nie heurystyka minut)
+        tr = str(team_region.get(team, "")) if has_reg else reg
+        spoza = has_reg and tr not in ("", "null", reg)
         rows.append({"player_id": pid, "team_id": team,
-                     "miejscowosc": dom_team.get(team, ""),
-                     "spoza_regionu": spoza})
+                     "miejscowosc": dom_team.get(team, ""), "spoza_regionu": spoza})
     zaw = pd.DataFrame(rows)
     zaw = zaw[zaw["miejscowosc"].astype(str).str.strip() != ""]
     zaw.to_csv("zawodnicy_miejscowosc.csv", index=False, encoding="utf-8-sig")
