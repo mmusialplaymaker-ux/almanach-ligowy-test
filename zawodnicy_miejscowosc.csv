@@ -1,6 +1,6 @@
 ﻿player_id,team_id,miejscowosc,spoza_regionu
 000d7d8c-0109-42c0-a765-5579a5cf7b86,3a62d1ac-565c-48e0-901a-fb0b5544ab36,Myślenice,True
-0020a0fc-6fb2-406e-9056-4d33713406d8,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzierzyn-Koźle,True
+0020a0fc-6fb2-406e-9056-4d33713406d8,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzierzyn-Koźle,False
 0049e539-b16b-426b-ae76-3de2d84e57c6,9c69cbf6-a58c-45e4-9234-871c74b0bdc5,Kraków,True
 0087cb57-9439-437e-b949-f65a2a1622f9,ffad36e4-7506-47d5-aa24-4f3fc1f5625c,Jemielnica,False
 00a10ba5-4e15-4a59-bc59-f3258105e8fe,4bf6df34-76d0-4fa7-99d8-dd4fc17b1319,Opole,False
@@ -12,7 +12,7 @@
 011ea550-caac-40aa-aa37-18a1d6e75359,2a1a6389-3c48-47d1-9550-fd5b2e5d32d0,RAKÓW SZTUCZNA MURAWA (Częstochowa),True
 012c9608-cd2e-4186-959e-6034ec5045f4,c3c842c4-c5e1-4e6f-9676-1e3a3bd66f02,NULL,False
 0169248e-bcbb-4acb-8bf3-50203f3b7f00,4ad2bf3f-80d9-45aa-869c-94d24e3c7fdd,Rzeszów,True
-017c33eb-8a61-4221-a321-7c7e07806f56,0d801f43-7b19-49ba-b4d5-6adfe7e827ed,Brzeg,True
+017c33eb-8a61-4221-a321-7c7e07806f56,0d801f43-7b19-49ba-b4d5-6adfe7e827ed,Brzeg,False
 018e0fcb-9100-4806-b402-b8a78413f205,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,False
 01baca13-abbf-4360-969a-3682a18254d6,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
 01cdb98e-cdf9-4de3-a20c-df5240b4c00e,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,False
@@ -72,7 +72,7 @@
 070cfab5-4174-4716-93e4-0403ba952e74,00d52fe4-88b4-4a47-89f6-9f5a9b188aa9,Ligota Oleska,False
 071d6175-3eba-4c17-8461-2fe1acf2ecc4,4bf6df34-76d0-4fa7-99d8-dd4fc17b1319,Opole,False
 07343042-e093-4ee2-8470-7c56b42c8b89,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,False
-0743c0f7-039a-44cf-a3c3-b326520e3a73,ad09e05d-a4c6-4f05-b0c0-5e8cb08778ed,Zawadzkie,True
+0743c0f7-039a-44cf-a3c3-b326520e3a73,ad09e05d-a4c6-4f05-b0c0-5e8cb08778ed,Zawadzkie,False
 076ffc08-9d6d-4c39-8c03-9651dc5c3a7c,c7877eac-e3e1-49fe-898b-45d0f6bdded3,Tarnów Op.,False
 07b66a9d-703b-432e-92ec-ae5e8060dead,4f5aa7dd-34c6-4e3d-bce4-0413d82e677f,Branice,False
 07e204b1-ee07-48ec-acf7-b7395996e647,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),False
@@ -146,7 +146,7 @@
 0ccd0ed3-7f04-42b6-a698-22aa4cca29be,e3c6ccdb-cdd1-4f97-b560-ed0f9efa2131,Rzeszów,True
 0cd711d9-b705-4756-82ae-32ead06d67ee,e3c6ccdb-cdd1-4f97-b560-ed0f9efa2131,Rzeszów,True
 0d03234f-51d1-44e7-b322-d477a43ad91e,bd37677f-605c-4322-b6ea-2bfad914de4b,Kielce,True
-0d07ac92-8bde-471a-b1c9-8e93bc790762,0c08d623-a1d8-4753-b336-6e26184527ab,Źlinice,True
+0d07ac92-8bde-471a-b1c9-8e93bc790762,0c08d623-a1d8-4753-b336-6e26184527ab,Źlinice,False
 0d34e67b-5e48-4a69-8a85-adc8ed88e2b2,69d3d5ab-393f-4009-b95a-f8df2091950e,Nysa,False
 0d524806-58e4-47cf-87ab-b2fab10f7ece,ee5833eb-4d2d-4d8e-abfd-430daa5748e8,Ujazd,False
 0d66c4a2-e766-48f3-825d-645902e0cd96,d444f288-08c1-4ebe-9c35-a0534c7902bf,Gościęcin,False
@@ -196,8 +196,8 @@
 1071333e-f0ab-4198-9ef2-2b736b9abf6e,d383eabe-c5ac-49ab-b27d-4cb12834d657,Nysa,False
 107c7241-105b-449e-a90b-c37a0a073979,d694a634-1fea-4ffb-bb28-1048468f6c5e,Chróścice,False
 1087a920-749c-4d43-bbee-ced180a0d61b,008ac1b7-065f-42f1-b67a-5fdeb1d06a38,Rzeszów,True
-1094d570-ca48-403e-9e5b-17bbdcd542f1,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,True
-109d6588-2f19-4e87-aeda-35aa01367fd8,bb454bf2-2c7b-446c-aa05-8b1595a21afa,GKS WIDAWA WILKÓW (Lubska),True
+1094d570-ca48-403e-9e5b-17bbdcd542f1,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
+109d6588-2f19-4e87-aeda-35aa01367fd8,bb454bf2-2c7b-446c-aa05-8b1595a21afa,GKS WIDAWA WILKÓW (Lubska),False
 10a66e37-1460-47af-aa43-b6777e2dad42,c72067cc-1aed-4581-8f36-a84b17f0fd0c,Kędzierzyn-Koźle,False
 10b66d9b-d52d-40a9-8990-97a3b70e7816,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
 10c5515a-18aa-44a2-99d1-704d389bce26,3607305c-94bb-4ec7-a826-5ed335e25dc5,Kluczbork,False
@@ -229,7 +229,7 @@
 12a72f5e-5c06-48ce-b76e-cc7f7e2a1af3,9e99f47c-57b1-4436-a353-c3b2b03ac192,Zabrze,True
 12b25ca0-1a60-4c3f-9409-9d5694abc78d,d17b09a1-4704-471e-9a8d-d5213eea9855,Olszanka,False
 12bbcae1-4de1-4f66-95ac-38099f0185b3,e62fb6b3-cd2f-4b66-be33-64a55826d518,Czarnowąsy,False
-12bff8bb-6ffc-4e25-b267-186fc16bec31,dd9433ae-7e8d-4814-af22-395833658862,Kluczbork,True
+12bff8bb-6ffc-4e25-b267-186fc16bec31,dd9433ae-7e8d-4814-af22-395833658862,Kluczbork,False
 12df1110-4cac-46b7-a76f-a4881397ec3b,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambinowice,False
 12e1ef12-bfa5-4d1a-98a8-857721cd36da,d444f288-08c1-4ebe-9c35-a0534c7902bf,Gościęcin,False
 13006e2c-fb15-4763-86eb-8decc15c026d,69b9dc31-6fc3-496c-a349-185a959e6d75,Staniątki,True
@@ -256,7 +256,7 @@
 14dc2a5c-ff9e-4464-a6f2-efb5260c06af,15051f88-36e6-4a70-8d09-abff8d5707e2,Luboszyce,False
 14e32031-2b2c-461c-b358-0847d47c88b9,0c08d623-a1d8-4753-b336-6e26184527ab,Źlinice,False
 151a66aa-4ad5-4c55-b90d-e05d4bdc5800,bb454bf2-2c7b-446c-aa05-8b1595a21afa,GKS WIDAWA WILKÓW (Lubska),False
-153b16d3-a983-428d-baba-3112e949b7db,2a0da3cb-8627-4dcb-908e-fdebdf6352ca,Opole,True
+153b16d3-a983-428d-baba-3112e949b7db,2a0da3cb-8627-4dcb-908e-fdebdf6352ca,Opole,False
 157b1d41-4d43-4a29-80e8-185867821f06,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzierzyn-Koźle,False
 158797fb-7587-40af-9e31-d47d5166f8d1,3fa28ca6-53db-4a2f-9fdc-27c0b2128101,NULL,False
 15882acb-360e-46f9-9686-9b6d2fd0bbf7,49200b46-aeda-47e9-bfae-5564e603ca38,Osowiec,False
@@ -273,7 +273,7 @@
 165bac66-78bc-4263-96f9-70f619b216fa,69d3d5ab-393f-4009-b95a-f8df2091950e,Nysa,False
 16638041-84ce-42ff-990a-8f56a2eb6e9e,f6caa855-f0b0-43b9-9b4a-dd357f0f51a9,NULL,False
 168086d5-bea0-4d1a-91e2-8bfe015103f2,5f7b5d40-d3ad-498e-8d56-c0597b61e077,Kędzierzyn-Koźle,False
-16a167c6-e58a-48dd-8a02-2ea0c01f716a,a68f0c90-c073-4de5-9488-83c1527c787a,Branice,True
+16a167c6-e58a-48dd-8a02-2ea0c01f716a,a68f0c90-c073-4de5-9488-83c1527c787a,Branice,False
 16a63d14-ac5a-4aab-be61-8bb0471750e8,5354fb60-4608-4a9e-a448-fe7569338a09,Kępa,False
 16b6ee20-e126-47d8-aea0-f89373a8c0f5,275f8c4e-f231-49a6-be3a-a6ece8e6e8f9,Częstochowa,True
 16c6ab53-ce41-4e37-83ad-94b34c580996,74fa394b-5786-4073-a126-a08ed9dab336,Nowiny,True
@@ -299,10 +299,10 @@
 17f6c6da-e325-45a8-9da4-3729c439282f,3fa28ca6-53db-4a2f-9fdc-27c0b2128101,NULL,False
 17fd9e04-2242-4262-9eb1-920a3ec2d1f1,2a1a6389-3c48-47d1-9550-fd5b2e5d32d0,RAKÓW SZTUCZNA MURAWA (Częstochowa),True
 183baa3f-510e-4fb0-b371-ec1b4fb40cdb,c7877eac-e3e1-49fe-898b-45d0f6bdded3,Tarnów Op.,False
-183e8d6d-7ccb-4541-9e19-fd18d9c227f5,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambinowice,True
+183e8d6d-7ccb-4541-9e19-fd18d9c227f5,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambinowice,False
 184b8207-8b8c-4522-aab3-65adcfbab3f7,75f79530-53f4-4d43-878f-acfc9ca49cee,Kraków,True
 186a1861-46b1-4c13-aa6f-68823c1e3508,dad50801-40ce-44bf-99a2-c5e93657b458,Byczyna,False
-18765ddc-bfc3-4c13-945c-e442d2166aed,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,True
+18765ddc-bfc3-4c13-945c-e442d2166aed,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
 1878f486-a679-43a4-87bc-1ace6b25334d,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,False
 187d613f-b75d-4987-8fe3-917a54f4e03c,c69e7a92-5fa0-4c95-bf6b-a713d16b8968,Opole,False
 18858c4e-9547-4c22-b38e-c3bbdcbc77c3,0066579b-fcf7-41d9-a76a-936ad42f39de,Korfantów,False
@@ -373,7 +373,7 @@
 1d0a226e-d19b-490b-ba3a-c640ba34c782,a5afddad-4dec-456a-91e4-3d41c5b585c9,GRODKÓW,False
 1d3117b7-6520-4560-9557-2b47dcbc9b7a,18675a2d-d79b-4249-a540-372797fba1b0,NULL,False
 1d3cdcb0-8525-4460-9f00-f2bc1b964530,d2856809-39f5-4206-af32-063b26b8b145,NULL,False
-1d4995b5-5dd0-412f-86d9-a3619ae3ed1b,2a0da3cb-8627-4dcb-908e-fdebdf6352ca,Opole,True
+1d4995b5-5dd0-412f-86d9-a3619ae3ed1b,2a0da3cb-8627-4dcb-908e-fdebdf6352ca,Opole,False
 1d569049-e1cf-4f1a-a800-92955bf0eb90,7be61fd9-697f-4068-b200-e52e1ffa00a8,Nowiny,True
 1d842ada-5b73-4aaa-a783-c40d874ef314,783fa8fb-0ea0-4802-9cc0-46f949f26213,Łąka Prudnicka,False
 1d884acf-3cc9-41bb-b03c-affbf2639999,35b6af12-db41-4b61-a4db-f6a3d7f9a0ca,Strzeleczki,False
@@ -603,7 +603,7 @@
 2e70ded6-be2a-4ba8-847e-c5c5eb6803b0,66030870-c3bb-4ca4-99da-02d8a7b959d2,Zabrze,True
 2e7473c2-afb1-4af6-b542-caaa527ae772,3ab6e2fe-923f-4a53-9e87-8223d956722d,Chorzów,True
 2e780dfd-d204-413f-8d39-5c31769628b0,a5afddad-4dec-456a-91e4-3d41c5b585c9,GRODKÓW,False
-2e792ceb-aaa4-4d50-9f13-9b842dd5157f,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,True
+2e792ceb-aaa4-4d50-9f13-9b842dd5157f,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,False
 2e7e5764-6171-487a-8582-0da523fb2d76,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzierzyn-Koźle,False
 2e941b6a-c04c-4431-b8c2-4d5966a0d0e3,b1e86f5e-2576-4dc9-9856-72845acf389e,NULL,False
 2e9c6331-0cf7-4616-9401-baf9dccd77bc,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,False
@@ -645,7 +645,7 @@
 3170f083-4100-49e9-99c8-82ec789a0dcb,a2769d93-0a62-44db-bf89-2a059c5bb816,Bielsko-Biała,True
 3172dc1f-981b-4955-93b0-2d1434c4dea4,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),False
 3175cedf-3610-4092-bfaa-e42e213e644d,18675a2d-d79b-4249-a540-372797fba1b0,NULL,False
-31919315-a22d-4bed-b781-b30c45e16ba1,a5929d96-7b01-4fbe-8f05-038fcf61154b,Skorogoszcz,True
+31919315-a22d-4bed-b781-b30c45e16ba1,a5929d96-7b01-4fbe-8f05-038fcf61154b,Skorogoszcz,False
 319b5fea-7117-4d44-85ad-0d8a20e2a8f2,00d52fe4-88b4-4a47-89f6-9f5a9b188aa9,Ligota Oleska,False
 31a415f4-4cca-40fa-8ac5-6a88502e7e4e,75f79530-53f4-4d43-878f-acfc9ca49cee,Kraków,True
 31ad098a-305d-4104-8d4c-6d06bbf536f2,5092c29e-2ec4-40a5-baf9-1e92770f2120,Grodków,False
@@ -774,7 +774,7 @@
 39556e81-cfd0-48d3-816d-aab3c3f06d25,879704d5-c80c-4c6e-abd4-d8c369fe150c,Brzeg,False
 3969ba9c-05ee-42f5-ba12-24a7a140e59e,afe1a570-ac04-452d-846e-d5e85a326712,OLESNO,False
 396d168b-33ee-4461-aff8-ae9f3bbfd95c,9567742c-7950-4f47-92ae-2356a993bbd0,Brzesko,True
-397b41c7-d41a-4e6e-8d39-662f6aab6f77,f3d21dcd-6ee1-42ec-befa-b91a60f68a73,Kobylice,True
+397b41c7-d41a-4e6e-8d39-662f6aab6f77,f3d21dcd-6ee1-42ec-befa-b91a60f68a73,Kobylice,False
 3993ddaf-29f5-4cc7-a2ef-8ee9bf219445,2f3c12d4-6cc1-4ee9-8b7e-af2f1ca5826d,Kędzierzyn-Koźle,False
 399b89d7-0c69-463e-a1e3-f8ce48509e5f,d3fd8316-5c77-4e84-815b-833e69774eb6,Rzeszów,True
 399ba04d-0b6d-4133-bdaf-d51586ead71e,e967e19e-1bb4-4725-a69a-9e3d38e1bf26,OLESNO,False
@@ -789,7 +789,7 @@
 3a1431d5-430e-439c-a418-bb15a195ea4c,0ace2088-88b6-4bee-bdcd-f05e5069f87b,Opole,False
 3a1cb54d-b8f5-415f-9ae4-71081c60a8ad,afe1a570-ac04-452d-846e-d5e85a326712,OLESNO,False
 3a24db48-b7c0-49e7-b80f-fdb3f9f5aa0a,2703bee6-ed93-4703-b150-a6b9791e2741,NULL,False
-3a498fab-38dc-4f9f-b4a9-7d7a2147d229,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,True
+3a498fab-38dc-4f9f-b4a9-7d7a2147d229,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,False
 3a55ad08-69f0-4f9d-b2f7-15e1ce573e94,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,False
 3ac698be-a518-41b0-8fb3-602353ca1730,e967e19e-1bb4-4725-a69a-9e3d38e1bf26,OLESNO,False
 3ae79689-60c0-4dc4-b349-55c5aaeba614,8f8bfae0-8e2d-4c99-aa6b-2e8ea2329d2b,Strzelce Opolskie,False
@@ -842,7 +842,7 @@
 3f948b6a-f054-4aed-8262-30483c2e1ab3,9906800d-ace3-4680-86e4-993dd8139315,Kędzierzyn-Koźle,False
 3fad041c-04c7-41bd-8d8d-bb7d0aecf59b,5ac9fb3c-cec7-4d4f-a9ad-3134449adc17,Kraków,True
 3fbc3b67-5bf5-4858-a1d1-a1296a011eff,f47a4015-4c84-4e7a-9a7e-d2c8dcb05a81,Kolonowskie,False
-3fdcc452-d3d6-450f-9515-b9022d9d8d45,2703bee6-ed93-4703-b150-a6b9791e2741,NULL,True
+3fdcc452-d3d6-450f-9515-b9022d9d8d45,2703bee6-ed93-4703-b150-a6b9791e2741,NULL,False
 3febe7de-ff90-47a1-b93a-e752edfe357d,474736fc-374a-4e21-98ef-31bb72d9af4e,NULL,False
 4010a6e3-cc43-44b1-8425-15366297e0fd,d383eabe-c5ac-49ab-b27d-4cb12834d657,Nysa,False
 4012a2ef-2ea1-4936-acff-105db15fdc8b,19db70aa-b71c-475e-ac1d-df29891ba92d,Biała,False
@@ -919,7 +919,7 @@
 45ac53ae-3c9c-42c0-8d52-fc0424f8f698,2a0da3cb-8627-4dcb-908e-fdebdf6352ca,Opole,False
 45e0d926-c61a-4264-b74f-923e2b4836ac,9c69cbf6-a58c-45e4-9234-871c74b0bdc5,Kraków,True
 45e51901-8144-4465-befd-956626574641,30f85224-90ec-49fc-ac4a-35a294c80881,NOWY SĄCZ,True
-45ec7802-7661-4017-b139-9d11f34cd584,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,True
+45ec7802-7661-4017-b139-9d11f34cd584,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
 46029b1b-fa77-4aaf-8792-ad94585c05ad,9c69cbf6-a58c-45e4-9234-871c74b0bdc5,Kraków,True
 460cb697-ec19-46ff-b547-f8f9bc2bef05,bf93b71f-31c2-47f5-a65c-041c924d1d17,Cisek,False
 462e8967-e98d-4be4-8577-16e6075d7112,d383eabe-c5ac-49ab-b27d-4cb12834d657,Nysa,False
@@ -985,7 +985,7 @@
 4a42661c-acff-4e0f-8de2-307c5c3c466a,90324de2-a749-4317-b425-b9669755de0e,Szczedrzyk,False
 4a4553df-936f-435f-b081-d951826e4707,b9a13a0e-dae6-47c8-a38c-edce6f1a5215,NULL,False
 4a7748a7-085a-49c7-847c-572189255824,bd37677f-605c-4322-b6ea-2bfad914de4b,Kielce,True
-4a7f4d10-25d7-4c98-94c6-203bf98e111d,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),True
+4a7f4d10-25d7-4c98-94c6-203bf98e111d,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),False
 4a871ab9-62d0-48f9-877e-bd34ecf8d22b,c505e379-167f-414c-a592-996a2aa44645,Cisek,False
 4aa38a78-8f59-4975-9878-de7e9fd89ae5,63202b70-ae42-4882-9cae-8b72107f0c95,Praszka,False
 4aa48866-a3cb-4495-8328-5cabac8c5566,c2d00024-2349-43b2-b764-b5325e26fb64,Kraków,True
@@ -1047,7 +1047,7 @@
 4fab8eb7-43a6-43e0-8230-c70f41efae6f,4f238ddc-5479-487e-b1a9-6bcacae4073f,Lewin Brzeski,False
 4fad3dd7-f2dd-4797-aa58-476b732a903a,2134478c-03ae-4b06-a2b5-90856a0d6ff5,Kluczbork,False
 4fb75094-7012-4e93-885b-8c376e7ea592,18675a2d-d79b-4249-a540-372797fba1b0,NULL,False
-4fbc9228-1f18-4c99-a0fa-068873b015a7,c7877eac-e3e1-49fe-898b-45d0f6bdded3,Tarnów Op.,True
+4fbc9228-1f18-4c99-a0fa-068873b015a7,c7877eac-e3e1-49fe-898b-45d0f6bdded3,Tarnów Op.,False
 4fbe32d2-5c3e-4e20-a746-d12179a47dc9,79e34a17-372d-4d0f-bcf5-64548c4d1948,Stadion LKS Mordarka (Mordarka 34-600),True
 4ff0617b-cdee-48b1-9b5d-20b4ea1f91bf,d444f288-08c1-4ebe-9c35-a0534c7902bf,Gościęcin,False
 500e422c-09e6-424c-822d-533696642fb2,66030870-c3bb-4ca4-99da-02d8a7b959d2,Zabrze,True
@@ -1082,7 +1082,7 @@
 5293b050-479c-43b8-a9b7-dd1b51688ca7,bd37677f-605c-4322-b6ea-2bfad914de4b,Kielce,True
 52a386a5-e979-4cbc-8f94-4e1aa43035b5,49200b46-aeda-47e9-bfae-5564e603ca38,Osowiec,False
 52c26c90-f62d-420d-8c71-a9a5f44496f1,65749f8b-f9de-4954-a9d9-91d33383a42c,Rzeszów,True
-52ceb2e1-01af-40ab-ae4d-1070db4c3c07,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambinowice,True
+52ceb2e1-01af-40ab-ae4d-1070db4c3c07,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambinowice,False
 52d2f285-816b-45a3-b137-52e9e21d7033,7eee5ec5-c97a-4a3f-809e-d9c5a4deefae,Chrząstowice,False
 52e5b475-b509-41f1-bdbb-a471293c3012,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,False
 52e9d13e-2c90-49f8-b708-dd47cfaa8628,bf93b71f-31c2-47f5-a65c-041c924d1d17,Cisek,False
@@ -1224,7 +1224,7 @@
 5e7da3d7-dc03-4015-860d-537e1fe89c14,3915ad20-52ac-453f-814c-450afec2817d,Nysa,False
 5e7f613c-cca2-4b95-915d-c0451d4bd3d5,879704d5-c80c-4c6e-abd4-d8c369fe150c,Brzeg,False
 5e8de1b2-9a80-41b8-a21d-09604755b34a,b7ea1600-cb90-4e79-a7d1-30fe88ae7536,Dębica,True
-5eafad36-378f-4e2d-aa4d-4e2934ab3680,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,True
+5eafad36-378f-4e2d-aa4d-4e2934ab3680,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
 5eb9fc33-04b5-4400-b5fb-1bd61a3bfed8,a16953b0-7fd7-48bb-9a4f-a870ebc0b50c,Kietrz,False
 5ebafd1e-8175-437c-b0ff-e1c55c7bdb3b,5763ce0c-0806-459f-b7d4-31a8e63ee02b,Chorzów,True
 5eeac5bc-ce62-4487-b718-5c858dbfc7a4,367825e7-9b30-4d24-a985-9229cd6d324b,Mechnice,False
@@ -1255,7 +1255,7 @@
 60f79cdf-4035-4b19-be88-d9eeb492ea42,59667c6a-4681-4f28-a172-e5b9849a9d1a,Zakliczyn,True
 60f91ed9-f4d1-4352-81bc-375316bf8529,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambinowice,False
 60fdbe9d-0dd5-439e-a4b5-361bfc3cb871,4df1ff7b-c0c8-4ccd-ab96-3c5085e26be1,Opole,False
-6106ac8c-ab66-40b2-b422-69f9659a6e9e,b7e7da54-b975-411c-bb70-5e319267a7f2,Dziergowice,True
+6106ac8c-ab66-40b2-b422-69f9659a6e9e,b7e7da54-b975-411c-bb70-5e319267a7f2,Dziergowice,False
 61192cbc-19b4-4ae9-b80f-11f58d2f2cf7,76f22279-58be-4fff-b48e-b9c4005ad8ee,Bogacica,False
 615cb26b-d9cd-46bc-a4c5-e517aad028c7,475f4887-cf9f-432c-bfa2-97e0e0639791,PACZKÓW,False
 616e5def-a583-4c18-b3b9-3465ba1b2e96,aa1b5546-605b-412f-85d3-25c4e475c6ef,Namysłów,False
@@ -1287,7 +1287,7 @@
 63768b2f-2136-45d7-9247-ec2c21ae6efb,10142296-3de6-4956-b538-b5e951c71e7a,Strzelce Opolskie,False
 637aaec2-a537-46f9-960e-e04e652484ef,28a88443-76e3-4b45-afca-ef5119a6b4a2,Zabrze,True
 637de9db-70e0-4cfb-8530-912a9be69f91,5ac9fb3c-cec7-4d4f-a9ad-3134449adc17,Kraków,True
-63af8a45-f7b8-4dae-a314-e52fea2b024d,365d6a84-cb40-4b10-807f-1e689c5960e1,Brzeg,True
+63af8a45-f7b8-4dae-a314-e52fea2b024d,365d6a84-cb40-4b10-807f-1e689c5960e1,Brzeg,False
 63b07ad5-eeb6-4d82-9322-b4f36c65e7a8,5354fb60-4608-4a9e-a448-fe7569338a09,Kępa,False
 63c0ae78-3d82-4140-a457-83beb5902279,2a1a6389-3c48-47d1-9550-fd5b2e5d32d0,RAKÓW SZTUCZNA MURAWA (Częstochowa),True
 63e53847-3bde-4aae-b097-0c8ceb601e68,75f79530-53f4-4d43-878f-acfc9ca49cee,Kraków,True
@@ -1346,7 +1346,7 @@
 671d3e5a-f997-4c12-bf15-17ca76d20d99,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,False
 671f0bae-29c2-4ad3-bae0-e97c0077e63b,98a6756e-b9b9-4e4c-b5d3-c32d434f4aa1,Jemielnica,False
 673675e2-5e85-45ba-b280-6d13f665d938,2a1a6389-3c48-47d1-9550-fd5b2e5d32d0,RAKÓW SZTUCZNA MURAWA (Częstochowa),True
-673b9e6f-4b94-483c-9018-c4a9a2695bf9,0d801f43-7b19-49ba-b4d5-6adfe7e827ed,Brzeg,True
+673b9e6f-4b94-483c-9018-c4a9a2695bf9,0d801f43-7b19-49ba-b4d5-6adfe7e827ed,Brzeg,False
 674846dc-7ede-489d-a31b-4a8026098dc9,f08ca3f0-714d-4a62-97ee-5fd38135e4c4,Dębica,True
 675c1c53-5037-4061-98f5-3e7e658a8004,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),False
 675fb270-554c-4758-9d65-dbb86aff429b,4a864382-b2de-4358-b65b-c649d18c16cd,Grodziec,False
@@ -1401,7 +1401,7 @@
 6bb3d2f4-9727-474c-8615-7c5026cda2a2,dd9433ae-7e8d-4814-af22-395833658862,Kluczbork,False
 6bd01e29-dfd9-440f-951a-288b28541143,6572d817-040d-43f2-afab-07f102d1e28f,Prudnik,False
 6bf81a9d-4f45-4f02-ac44-4194da5b2df0,dd9433ae-7e8d-4814-af22-395833658862,Kluczbork,False
-6bfaaaca-9c3f-4689-8a62-47d16b18b3e0,bf7d5cb7-d3d0-463d-8efe-b40e7b189a4f,Lubin,True
+6bfaaaca-9c3f-4689-8a62-47d16b18b3e0,bf7d5cb7-d3d0-463d-8efe-b40e7b189a4f,Lubin,False
 6bfe5ede-d5df-43b5-af1a-01a4261139b1,b570da26-3489-49bc-b9ce-1c31c8a5f7c2,Rzeszów,True
 6c3ea6e5-db9b-4bf0-b47e-644a68836d17,3c7d6f9a-63ba-4dd7-be7a-f85f35db89e5,Chorzów,True
 6c40a1bd-e7ab-4ee8-aee4-e2f46e6d23cc,98027346-b3f7-4525-badb-0e4b6fe6cfa2,Katowice,True
@@ -1573,7 +1573,7 @@
 792e8761-a70f-44a4-aad7-71b4d77c3365,3fa28ca6-53db-4a2f-9fdc-27c0b2128101,NULL,False
 792fbf5c-f0ba-4195-9c3b-469f1a425853,e3b527a5-0001-4a4d-ad81-f789f2ecfa73,Kraków,True
 79428711-204e-49d6-ab26-4a9b55e045c2,f001eb8d-40d4-48eb-b4f3-a5b74ccafcfb,Chocianowice,False
-79485ce8-9171-476a-b8f6-163597d911c3,a85cd20e-d5d7-4689-acc1-b57fea9bf1f9,NULL,True
+79485ce8-9171-476a-b8f6-163597d911c3,a85cd20e-d5d7-4689-acc1-b57fea9bf1f9,NULL,False
 797cbe11-0ca9-46db-8fb7-f6621a0960f9,5092c29e-2ec4-40a5-baf9-1e92770f2120,Grodków,False
 7988c620-a40d-4677-bd9e-628bf587af0e,761dd6af-f3a9-470e-b40b-d06bc50c9dca,Mechnice,False
 798f7204-017f-4bd5-a5a4-f9141ff226de,4a79f74e-90e3-4827-adfa-30fb439a591e,Lewin Brzeski,False
@@ -1602,7 +1602,7 @@
 7b32fbc6-c73f-424b-bcbb-2905883ec93e,f6caa855-f0b0-43b9-9b4a-dd357f0f51a9,NULL,False
 7b63303f-9674-4258-9320-09d398ebdfad,a85cd20e-d5d7-4689-acc1-b57fea9bf1f9,NULL,False
 7b7905c1-0204-4a6b-9e2c-5e414ddbff93,66030870-c3bb-4ca4-99da-02d8a7b959d2,Zabrze,True
-7b843ab4-86fd-46a7-9ed4-80259c151437,51949e64-256e-4c12-a46d-5182c5a2e062,Dobrzeń Wielki,True
+7b843ab4-86fd-46a7-9ed4-80259c151437,51949e64-256e-4c12-a46d-5182c5a2e062,Dobrzeń Wielki,False
 7b9f4100-5059-4d0c-adc4-e3581ff28cc0,2134478c-03ae-4b06-a2b5-90856a0d6ff5,Kluczbork,False
 7bd051d1-76fb-4b25-8260-3976ed1b9959,bcbc53ea-515e-48bb-b928-3a9185d19d38,Rzeszów,True
 7be018b6-3ec0-4eac-8937-2311caa85957,4bf6df34-76d0-4fa7-99d8-dd4fc17b1319,Opole,False
@@ -1629,7 +1629,7 @@
 7e19458b-bf37-441e-ad38-70a4f29e317e,b58f2e6d-33d1-4106-85e8-323ff4ef50c9,Częstochowa,True
 7e1e06a8-e8e1-4f0b-9e7a-818ae5df1ede,9c97fbed-aec1-47cb-89d0-8ecada786510,Namysłów,False
 7e2fefe1-627a-43cc-bf0c-b144f6b6ca1f,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,False
-7e4ee00f-242e-41a2-b3a7-38cf28fe859f,90324de2-a749-4317-b425-b9669755de0e,Szczedrzyk,True
+7e4ee00f-242e-41a2-b3a7-38cf28fe859f,90324de2-a749-4317-b425-b9669755de0e,Szczedrzyk,False
 7e507ae0-103a-48fc-a21e-1793002497f2,9b8c9a7c-f4e0-4b27-8a4e-e0a9ac0d4af9,Kraków,True
 7e5b9741-dd92-4a00-9071-18cceea00347,e7ef00a4-5467-4179-a662-d13fb22c3a12,Skarbimierz,False
 7e63c3df-cb99-4235-8cf9-f7d2076491f6,15051f88-36e6-4a70-8d09-abff8d5707e2,Luboszyce,False
@@ -1710,14 +1710,14 @@
 85493833-be2e-47f4-8c29-bc220d620978,6572d817-040d-43f2-afab-07f102d1e28f,Prudnik,False
 85495fb3-434c-4ae3-bd83-2a74848f54da,68d1de4d-af3a-47d3-8f6a-d55ff6f243bd,Ujazd,False
 85655fc6-c023-4129-a6ec-bc14686534d1,e3c6ccdb-cdd1-4f97-b560-ed0f9efa2131,Rzeszów,True
-856657b3-f289-4b8b-ae30-40ceabe496cb,53f1e9e7-acc3-4019-a4df-90260a2d4ea9,Gorzów Wielkopolski,True
+856657b3-f289-4b8b-ae30-40ceabe496cb,53f1e9e7-acc3-4019-a4df-90260a2d4ea9,Gorzów Wielkopolski,False
 856af4b0-920c-4e75-978b-376db4d55330,af12ce06-4cdc-4452-bb6d-5c56bb01eb98,Kozłów,True
 8594b3ae-f444-4e2c-8bb2-cbfbe53db734,b570da26-3489-49bc-b9ce-1c31c8a5f7c2,Rzeszów,True
 85d1d1cb-64f3-4cd0-857c-6464d55d2fe8,30f85224-90ec-49fc-ac4a-35a294c80881,NOWY SĄCZ,True
 85eedf1d-83d6-4517-9ea1-eca4b22fbdbd,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,False
 860251d4-97c2-4f41-952a-9abf6e47b18b,2134478c-03ae-4b06-a2b5-90856a0d6ff5,Kluczbork,False
 860e037e-7bc2-458b-9507-886c908ef240,daab46d4-d252-46df-bb28-7a5744ce0146,Staniątki,True
-86199622-244f-42ac-8cb2-6c9d9c7d2150,51482543-b7b2-422b-b7a0-12b670c37b13,NULL,True
+86199622-244f-42ac-8cb2-6c9d9c7d2150,51482543-b7b2-422b-b7a0-12b670c37b13,NULL,False
 8626dffa-abfa-4ab9-8526-762e6a1c768e,a5afddad-4dec-456a-91e4-3d41c5b585c9,GRODKÓW,False
 86315f45-45a8-48e5-b10e-8a19df9150bf,302ed025-4d83-4bd2-bffd-8f451ecbaf95,NULL,False
 865cad53-6c81-4aac-b3bb-9f0d092e4f3a,7eee5ec5-c97a-4a3f-809e-d9c5a4deefae,Chrząstowice,False
@@ -1769,7 +1769,7 @@
 8a1f4847-607a-458b-b31c-52c9ac44db47,0329f4d3-11df-4a3f-a2a3-932ad8b45a6c,Korfantów,False
 8a5b44ab-8de6-43e9-9acc-a82a94a65f80,907a02bc-1c88-498e-b831-3492b6ff8996,Bielsko-Biała,True
 8a5f0017-757d-4365-9f9d-5c7171ee657f,66fca5b1-e20d-4059-93d9-52d6a792048a,Komprachcice,False
-8a67f925-0791-477d-850b-29ed2d71dadc,6572d817-040d-43f2-afab-07f102d1e28f,Prudnik,True
+8a67f925-0791-477d-850b-29ed2d71dadc,6572d817-040d-43f2-afab-07f102d1e28f,Prudnik,False
 8a71aae7-9062-4931-9c51-bc30f2ecdeb2,4df1ff7b-c0c8-4ccd-ab96-3c5085e26be1,Opole,False
 8a8a2efb-eed5-4035-96ac-a080a21b38b9,2a03780a-04c7-46d1-a3be-8e5aca6aa5b8,Prószków,False
 8a8e4fb3-27cd-40b4-b3d4-bf1c325ebad5,28a88443-76e3-4b45-afca-ef5119a6b4a2,Zabrze,True
@@ -1857,7 +1857,7 @@
 9153ae98-c3dd-456d-be52-8bcad712e83a,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,False
 916f4346-bbcb-47c3-931f-a7d8122dcdd0,d89bb386-6ae7-4d72-a40c-00321ea3ad7d,Namysłów,False
 9188a875-f51d-4e29-b411-c0be22020f99,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,False
-91a36d30-2297-4d63-b1bf-daccea516847,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,True
+91a36d30-2297-4d63-b1bf-daccea516847,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,False
 91ae2e67-b29b-4f85-a112-ba826a085087,b9a13a0e-dae6-47c8-a38c-edce6f1a5215,NULL,False
 91d0d3ce-5e98-4ed5-a025-131f1355c842,9567742c-7950-4f47-92ae-2356a993bbd0,Brzesko,True
 91f91094-d4cb-48be-91d0-4793f8216655,6d7f0770-563a-40a8-a302-cbb5bef334cb,LIMANOWA,True
@@ -1959,10 +1959,10 @@
 9913e72d-d882-4fe2-a07f-4d7bb1276d4d,14d3b273-b718-4fed-90e9-e1d604b4caae,NULL,False
 9923d397-1607-400e-98f7-2f318483b8a8,8366c90c-a1d8-4b30-ae2a-b7433b0006dc,Dziergowice,False
 99430868-473e-45dd-a2fa-595b41750e05,00d52fe4-88b4-4a47-89f6-9f5a9b188aa9,Ligota Oleska,False
-994eda67-fbf0-465d-b8a8-0db4b75a3579,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,True
+994eda67-fbf0-465d-b8a8-0db4b75a3579,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,False
 9970ef48-1412-41a1-95a0-c8e53ecf8b34,c69e7a92-5fa0-4c95-bf6b-a713d16b8968,Opole,False
 99788b3d-e1a2-475a-ba60-9cecbf3b5879,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,False
-99828f39-0d0c-4ab9-ac15-09837aabbbaf,83957235-7bea-485d-9a8d-89f1eecb76be,Niemodlin,True
+99828f39-0d0c-4ab9-ac15-09837aabbbaf,83957235-7bea-485d-9a8d-89f1eecb76be,Niemodlin,False
 99927100-3332-400d-a99a-11ab235389fc,5ac883e9-b9cb-4231-92bb-ff437583179c,Brzeg,False
 99a3f6a3-d47c-453b-b2bb-6ffa86793385,00d52fe4-88b4-4a47-89f6-9f5a9b188aa9,Ligota Oleska,False
 99ac2b51-77b9-4b0a-8e8e-81324281137a,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzierzyn-Koźle,False
@@ -1995,7 +1995,7 @@
 9b5ca5cf-c0a6-4b5c-bf40-ab154033d6da,bb033ddf-414f-4091-9fe1-6ad743898404,NULL,False
 9b72568b-9587-4d47-97ad-d2c8b7596611,7e106142-7b84-4919-8916-d8b9054a4494,Chróścice,False
 9b794731-d9bb-489d-8b3a-c6e9c7d4f839,53729db6-6a4d-4726-8ea3-0fe5a059238d,Skarbimierz,False
-9b9303ae-9d70-45f1-818a-b9bf96533d42,c69e7a92-5fa0-4c95-bf6b-a713d16b8968,Opole,True
+9b9303ae-9d70-45f1-818a-b9bf96533d42,c69e7a92-5fa0-4c95-bf6b-a713d16b8968,Opole,False
 9ba143ba-34a1-4419-a0c0-fe3cc167f633,556fe0d7-9eca-498a-8f11-89c32175b000,Kielce,True
 9bacf095-9fe9-4061-9595-ba72f83df182,b1e86f5e-2576-4dc9-9856-72845acf389e,NULL,False
 9bb32edf-5fd8-4073-8517-edcb4e5045c9,2a0da3cb-8627-4dcb-908e-fdebdf6352ca,Opole,False
@@ -2006,7 +2006,7 @@
 9be1f0f4-a6f6-4684-aac9-c3b229fea384,afe1a570-ac04-452d-846e-d5e85a326712,OLESNO,False
 9be25ba8-e69e-4c4d-af54-591357f183e2,2134478c-03ae-4b06-a2b5-90856a0d6ff5,Kluczbork,False
 9bebb5df-acaa-4d33-945d-a814938a8cd1,2703bee6-ed93-4703-b150-a6b9791e2741,NULL,False
-9bfa36f0-c29f-438f-9d60-2ea170ee6e48,14d3b273-b718-4fed-90e9-e1d604b4caae,NULL,True
+9bfa36f0-c29f-438f-9d60-2ea170ee6e48,14d3b273-b718-4fed-90e9-e1d604b4caae,NULL,False
 9bfee52f-d36c-40f8-80f8-e779720cfea6,7be61fd9-697f-4068-b200-e52e1ffa00a8,Nowiny,True
 9c0e8dda-8850-43ab-9570-c8c77333b0f8,e7ef00a4-5467-4179-a662-d13fb22c3a12,Skarbimierz,False
 9c1dfe93-5389-4f5f-b388-834fbcf51a59,4df1ff7b-c0c8-4ccd-ab96-3c5085e26be1,Opole,False
@@ -2083,7 +2083,7 @@ a309a991-9f2f-4823-8386-5e255286f518,65749f8b-f9de-4954-a9d9-91d33383a42c,Rzesz�
 a312808d-0c3f-4fa5-928e-c63b5ae217b5,6d7f0770-563a-40a8-a302-cbb5bef334cb,LIMANOWA,True
 a31cf50b-dcec-46d7-b93c-cbb72cea3210,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,False
 a33f41c9-5a75-45e1-8955-1978d7e2c9a2,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
-a3546adb-73e3-4d5a-8b80-1d9f95ba829c,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,True
+a3546adb-73e3-4d5a-8b80-1d9f95ba829c,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,False
 a357e585-9852-4ebd-b60a-698104460ede,53729db6-6a4d-4726-8ea3-0fe5a059238d,Skarbimierz,False
 a35d9949-3746-493b-af61-720f6062bbfe,c505e379-167f-414c-a592-996a2aa44645,Cisek,False
 a376222d-65cd-46aa-80c0-5fce5b54c58a,f47a4015-4c84-4e7a-9a7e-d2c8dcb05a81,Kolonowskie,False
@@ -2187,7 +2187,7 @@ aaff55ce-a462-4390-9693-3b82e0c594de,afe1a570-ac04-452d-846e-d5e85a326712,OLESNO
 ab025a7b-2800-4213-81f3-3336720b4efd,c7877eac-e3e1-49fe-898b-45d0f6bdded3,Tarnów Op.,False
 ab0c08da-2da6-497c-84f2-f4d46a3ac9f9,f6caa855-f0b0-43b9-9b4a-dd357f0f51a9,NULL,False
 ab0cf050-0b3d-4696-95a8-5ea40ce2a295,ee5833eb-4d2d-4d8e-abfd-430daa5748e8,Ujazd,False
-ab1044eb-cff8-4e6d-9e63-10763c584416,51482543-b7b2-422b-b7a0-12b670c37b13,NULL,True
+ab1044eb-cff8-4e6d-9e63-10763c584416,51482543-b7b2-422b-b7a0-12b670c37b13,NULL,False
 ab21ca58-b7cb-408c-a9af-3180ff309eab,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,False
 ab25e9dc-953d-4531-a467-67e1f944f2de,879704d5-c80c-4c6e-abd4-d8c369fe150c,Brzeg,False
 ab319bc4-c030-472e-b103-83c585363243,695f564d-47aa-41e5-ac18-7918c1768896,Gliwice,True
@@ -2247,7 +2247,7 @@ af3a7da9-5e95-4d09-bd61-6c8abaf48340,0c08d623-a1d8-4753-b336-6e26184527ab,Źlini
 af3b49ab-67e8-423e-8837-8637fe3be0f4,51482543-b7b2-422b-b7a0-12b670c37b13,NULL,False
 af55fc01-2abb-43de-836c-8a09c7e52922,49200b46-aeda-47e9-bfae-5564e603ca38,Osowiec,False
 af7fb83f-c596-4c35-b825-6ac6d97939a9,9b8c9a7c-f4e0-4b27-8a4e-e0a9ac0d4af9,Kraków,True
-af914c48-979f-426b-b5fe-546f89dae8d3,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,True
+af914c48-979f-426b-b5fe-546f89dae8d3,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,False
 af914f1f-4853-4100-bbed-163231b41569,761dd6af-f3a9-470e-b40b-d06bc50c9dca,Mechnice,False
 afdaff4e-c9ad-46aa-805f-e49b96959bad,761dd6af-f3a9-470e-b40b-d06bc50c9dca,Mechnice,False
 b01a8f1a-7289-4032-ad28-99e03292f4f4,10142296-3de6-4956-b538-b5e951c71e7a,Strzelce Opolskie,False
@@ -2300,7 +2300,7 @@ b3d48918-6fce-408d-9c5f-fe30a975768e,4a864382-b2de-4358-b65b-c649d18c16cd,Grodzi
 b3ffa7a3-5848-4fe3-844e-c189cd33d23d,83d76c41-6122-46d6-95d7-b5961529dc58,Brożec,False
 b475f7cd-e7ea-4945-ba5c-0c49706f1948,3a62d1ac-565c-48e0-901a-fb0b5544ab36,Myślenice,True
 b4aadfa7-6cb9-4af4-960c-e761a90ae566,2a1a6389-3c48-47d1-9550-fd5b2e5d32d0,RAKÓW SZTUCZNA MURAWA (Częstochowa),True
-b4c25142-02b3-46fc-b266-be692d8da378,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,True
+b4c25142-02b3-46fc-b266-be692d8da378,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
 b4eac666-b3be-4735-9813-a16fe7c94dd3,14a7519d-b23f-4e0f-8c54-99b6968f3d41,Łagów,True
 b50510dd-159e-4c61-a7aa-a52e51a9ea80,8280263e-15d9-4411-bb09-c67cb7bb0d3f,Gorzów Śląski,False
 b506f100-c824-4582-b5bf-2b125ba76adf,1d9fc271-3040-432a-afda-249924366284,Strzelce Opolskie,False
@@ -2363,7 +2363,7 @@ b9766b8a-8d7e-4de1-afb0-eb04c3f6584b,9f54383d-7973-4815-84ec-ad7fd905a806,Ujazd,
 b979e70e-8c14-4410-87ff-9fe2c065c2d5,f028e7fe-81b0-4f07-b64f-72b0c206cd83,Komprachcice,False
 b9860e0d-bfae-46dd-a0ea-47f89b8726b9,7be61fd9-697f-4068-b200-e52e1ffa00a8,Nowiny,True
 b9923caa-acfa-48c3-88af-1c4ba7f99848,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
-b9aec3cb-7557-461a-8fb1-3caa6d012acc,554edb8a-6efb-45ad-8397-0c35aad3faa8,Opole,True
+b9aec3cb-7557-461a-8fb1-3caa6d012acc,554edb8a-6efb-45ad-8397-0c35aad3faa8,Opole,False
 b9af1201-ff02-427f-9d58-1c48ed805018,d383eabe-c5ac-49ab-b27d-4cb12834d657,Nysa,False
 b9c52aaf-f397-43a1-b5f2-da1ddee53ff6,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,False
 b9d01eaa-ecd3-4d98-8a14-e2af964a1a69,4a79f74e-90e3-4827-adfa-30fb439a591e,Lewin Brzeski,False
@@ -2426,7 +2426,7 @@ be9632a9-291d-4e29-8f2e-9916dd954787,c7877eac-e3e1-49fe-898b-45d0f6bdded3,Tarnó
 bebcc030-0af5-46be-839a-7f0c6951e694,a8e079d7-4736-44c0-a31f-4d269d848497,RAKÓW SZTUCZNA MURAWA (Częstochowa),True
 becd6f48-52d0-4398-8689-07dd7a34d806,74fa394b-5786-4073-a126-a08ed9dab336,Nowiny,True
 bed66d8d-8bb1-4449-b7dc-155c019965b2,ad09e05d-a4c6-4f05-b0c0-5e8cb08778ed,Zawadzkie,False
-bf04cea3-9459-4120-b20e-73688cc0d9e7,51b15631-6af4-493f-98dd-6ecf7c080bdb,Chróścice,True
+bf04cea3-9459-4120-b20e-73688cc0d9e7,51b15631-6af4-493f-98dd-6ecf7c080bdb,Chróścice,False
 bf2223d9-72b1-47f4-9e52-1b4125d7df58,f4e626de-8898-40ca-93eb-e9034377cf23,Kraków,True
 bf680454-47af-463e-856d-2de702235260,0329f4d3-11df-4a3f-a2a3-932ad8b45a6c,Korfantów,False
 bf6bc977-fee1-43bb-921e-6bd5eacebaa1,e3c6ccdb-cdd1-4f97-b560-ed0f9efa2131,Rzeszów,True
@@ -2453,7 +2453,7 @@ c0f413af-44c5-41e6-acfa-583284ebd0f5,4bf6df34-76d0-4fa7-99d8-dd4fc17b1319,Opole,
 c0fd9a41-b757-499a-a72a-3c3c4e9190da,a5929d96-7b01-4fbe-8f05-038fcf61154b,Skorogoszcz,False
 c13ab024-c876-4d37-b390-69c109e18bcf,c505e379-167f-414c-a592-996a2aa44645,Cisek,False
 c14a6720-38ad-4955-9f0d-44e1b29d4932,3fa28ca6-53db-4a2f-9fdc-27c0b2128101,NULL,False
-c14a8c2c-5885-465b-a4aa-43cd1263668e,367825e7-9b30-4d24-a985-9229cd6d324b,Mechnice,True
+c14a8c2c-5885-465b-a4aa-43cd1263668e,367825e7-9b30-4d24-a985-9229cd6d324b,Mechnice,False
 c16f0f88-b276-46c1-babe-8fa40a4b89fd,b1e86f5e-2576-4dc9-9856-72845acf389e,NULL,False
 c1907071-03b3-4c10-803d-c4871ac17160,65ddf28a-ab58-4a36-a303-4ad56051d132,Katowice,True
 c19c9f0c-9e77-4206-be9f-161dce24c203,d3fd8316-5c77-4e84-815b-833e69774eb6,Rzeszów,True
@@ -2466,7 +2466,7 @@ c205d260-e3bf-43cd-bd81-6a33ca85d9b3,92c34426-2960-45d4-8ff9-4086867746da,Opole,
 c207ab51-bf06-4553-a2c1-94aa9f5ab90a,556fe0d7-9eca-498a-8f11-89c32175b000,Kielce,True
 c21288d6-dd4c-4a5f-abbf-1ba15f8fa62c,15051f88-36e6-4a70-8d09-abff8d5707e2,Luboszyce,False
 c22b920f-66a2-469c-b28a-238d27dce2c5,208daa2b-e9d8-42da-8a39-2ffdea9d743d,Opole,False
-c22fd400-56a5-40dd-a240-588a16de17ae,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,True
+c22fd400-56a5-40dd-a240-588a16de17ae,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,False
 c23b1ad2-1d74-4f75-ad8e-c6a0d96b5038,51949e64-256e-4c12-a46d-5182c5a2e062,Dobrzeń Wielki,False
 c242e0ff-07ae-4823-850f-740db5d9479b,4392974b-0494-411a-9ed3-e48ccae8c87a,OLESNO,False
 c24a0929-306b-4b87-a763-831436fdf48e,383e5b61-e80d-4b21-ad91-b23890a43584,LZS KS Polonia Przylesie (Przylesie 155),False
@@ -2499,7 +2499,7 @@ c477b23a-605d-4e43-9fdb-9c191843ead1,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,
 c478a623-e01d-4d81-a40e-88115ab0db3f,4c497658-a50c-4110-90dc-49f020895df1,GRODKÓW,False
 c4960e68-81cb-4fa9-b86c-c735c56e9692,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),False
 c497484c-f292-4317-bb71-2fc0d9f670ea,ee5833eb-4d2d-4d8e-abfd-430daa5748e8,Ujazd,False
-c4985ade-934e-426c-b684-02220193c948,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,True
+c4985ade-934e-426c-b684-02220193c948,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,False
 c49a7017-5d18-4af8-b814-bc8077e22ad6,def5a7d7-331b-4032-867f-0a17121566c1,Nysa,False
 c4ae484c-ac3f-47ec-86c7-61d67df58158,a85cd20e-d5d7-4689-acc1-b57fea9bf1f9,NULL,False
 c4b7431b-8d04-4170-9bd4-6ca2e6a79a4c,a651c550-01ce-4d22-9683-36ada23822da,Brzesko,True
@@ -2530,7 +2530,7 @@ c6ec0eb0-dd6e-4cb8-8745-16abb70a81d5,fa6f8795-e125-4739-9abc-0a40bbbbc1cc,ŚCIBO
 c6ecad13-0c17-46a9-8509-f0c04070608b,53729db6-6a4d-4726-8ea3-0fe5a059238d,Skarbimierz,False
 c6ff1995-7342-4da7-a74b-fa62542e0e9f,c37b3cc6-1a70-45de-8cdf-ed19e3643ba2,Gliwice,True
 c707c0bf-d3d2-4301-aedb-36ed10afa97e,35b6af12-db41-4b61-a4db-f6a3d7f9a0ca,Strzeleczki,False
-c71a1aeb-0d96-4363-aa32-5e4fa66f3569,554edb8a-6efb-45ad-8397-0c35aad3faa8,Opole,True
+c71a1aeb-0d96-4363-aa32-5e4fa66f3569,554edb8a-6efb-45ad-8397-0c35aad3faa8,Opole,False
 c723dfa7-089d-460a-a8d9-10d448adf907,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,False
 c7315811-9513-4442-9205-7389ec3505ca,65749f8b-f9de-4954-a9d9-91d33383a42c,Rzeszów,True
 c73b386e-3917-429e-9ae6-2b20f0bc8210,b58f2e6d-33d1-4106-85e8-323ff4ef50c9,Częstochowa,True
@@ -2625,7 +2625,7 @@ cf6cd036-0a21-4f87-86ee-e4eb0db7437c,b570da26-3489-49bc-b9ce-1c31c8a5f7c2,Rzesz�
 cf70b95c-8e17-436d-be9a-6b1266e27b00,ffad36e4-7506-47d5-aa24-4f3fc1f5625c,Jemielnica,False
 cf7b70f4-4989-430a-847e-4418b094b92d,65ddf28a-ab58-4a36-a303-4ad56051d132,Katowice,True
 cf7e44e1-8b11-4c4c-9207-676c71e149be,ffad36e4-7506-47d5-aa24-4f3fc1f5625c,Jemielnica,False
-cf82abe0-00f2-4011-8a4d-341417dbdc2c,f3d21dcd-6ee1-42ec-befa-b91a60f68a73,Kobylice,True
+cf82abe0-00f2-4011-8a4d-341417dbdc2c,f3d21dcd-6ee1-42ec-befa-b91a60f68a73,Kobylice,False
 cf92e95a-4dcc-4950-a0d2-95096e36973b,ab6a0031-94e1-42e2-8812-9ff44eb6747e,Katowice,True
 cfbe8480-134f-47b4-94f3-5ee7a75ad2e1,ee5833eb-4d2d-4d8e-abfd-430daa5748e8,Ujazd,False
 cfd86195-c201-4f86-900e-1add7fff36bb,e68eeb05-075e-4f9c-876d-9f74be335ec0,Bielsko-Biała,True
@@ -2729,7 +2729,7 @@ d73d2c5f-0e6a-41fa-8b1e-e2d2301153fd,b58f2e6d-33d1-4106-85e8-323ff4ef50c9,Częst
 d74a81ae-73dc-4475-90a8-e0a7a8e7a1a7,b570da26-3489-49bc-b9ce-1c31c8a5f7c2,Rzeszów,True
 d74e263e-92d3-4097-b156-1b0efd3d65c3,e1534e6b-4a53-458a-b606-ed5fa66639e5,Grodków,False
 d761a9ba-d1c0-47c2-86d5-fb68fa70ee57,b7ea1600-cb90-4e79-a7d1-30fe88ae7536,Dębica,True
-d762b965-0618-49c5-b890-fffed4c16602,302ed025-4d83-4bd2-bffd-8f451ecbaf95,NULL,True
+d762b965-0618-49c5-b890-fffed4c16602,302ed025-4d83-4bd2-bffd-8f451ecbaf95,NULL,False
 d769c0b5-40a7-4f33-93ff-b8d1d39f1968,38f1b646-8e53-496e-8cf6-b73c31b92f38,Praszka,False
 d7b0be74-ebd9-4ba0-b011-260ef471acfe,d694a634-1fea-4ffb-bb28-1048468f6c5e,Chróścice,False
 d7cbcfe9-df48-40ba-bc77-87752178ac7a,3a62d1ac-565c-48e0-901a-fb0b5544ab36,Myślenice,True
@@ -2752,10 +2752,10 @@ d92c76c2-6f69-4bd1-a62a-3494f9bc4256,d29c5b04-4b67-47b3-8afe-4a93f7f59ed1,Głog�
 d92f5791-bc26-45d5-a4d2-cf02ca89c61e,07d3a915-09d0-4876-a230-9e2d4c31236b,NOWY SĄCZ,True
 d9339be8-0602-4f47-b054-b1fbc0d13676,beaf0691-faff-49ea-a5bd-1fb761f59431,Gościęcin,False
 d9366e1e-ac3f-441b-ac72-669c6a289ca3,5092c29e-2ec4-40a5-baf9-1e92770f2120,Grodków,False
-d94b5116-9e83-4378-8235-b1108d6b5340,49200b46-aeda-47e9-bfae-5564e603ca38,Osowiec,True
+d94b5116-9e83-4378-8235-b1108d6b5340,49200b46-aeda-47e9-bfae-5564e603ca38,Osowiec,False
 d94d77de-c776-4f0c-91c2-df5fec460ede,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
 d98ae747-539d-4e8e-ace9-3e69ba072a0b,f8ef4df5-32b0-4481-9afa-f6e66f3e7d2c,Kluczbork,False
-d9e1e50e-a954-4356-82d6-1cf5220d4937,554edb8a-6efb-45ad-8397-0c35aad3faa8,Opole,True
+d9e1e50e-a954-4356-82d6-1cf5220d4937,554edb8a-6efb-45ad-8397-0c35aad3faa8,Opole,False
 da0c20b3-8acc-4a35-901d-624a163b5f41,11616eec-e82a-4f6f-8ac3-3482a290e58c,Rzeszów,True
 da118466-5632-4bb0-aeba-936b34c29ac5,4df1ff7b-c0c8-4ccd-ab96-3c5085e26be1,Opole,False
 da1f7b73-1386-49c2-8429-4395dae0c2d7,ad09e05d-a4c6-4f05-b0c0-5e8cb08778ed,Zawadzkie,False
@@ -2777,7 +2777,7 @@ db4db339-0428-43ba-b3cd-4eefa462427a,3dcab22c-bdf4-4e37-90da-7968e9ca7bff,Łambi
 db577380-1152-4101-85c5-637c349096f7,a5929d96-7b01-4fbe-8f05-038fcf61154b,Skorogoszcz,False
 db76a41d-da2b-4914-9b8d-4d599b7a1b77,f6caa855-f0b0-43b9-9b4a-dd357f0f51a9,NULL,False
 db96bf02-48ca-4bc7-845f-bee73c78a54b,b9a13a0e-dae6-47c8-a38c-edce6f1a5215,NULL,False
-db990a30-1aca-49ef-84fd-b90d397cc013,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,True
+db990a30-1aca-49ef-84fd-b90d397cc013,e9c851d2-77b8-408e-b331-c4d1bcfc1572,Głogówek,False
 dba11be4-244b-405a-8056-194bb219903e,3b0cc4dd-d1bb-4350-94e6-ef2f60f5e610,NULL,False
 dbace332-a378-4ce5-bce0-940ff22904c7,5ac9fb3c-cec7-4d4f-a9ad-3134449adc17,Kraków,True
 dbb1c274-c2ec-4fe7-b567-acbe68b908a6,e62fb6b3-cd2f-4b66-be33-64a55826d518,Czarnowąsy,False
@@ -2815,7 +2815,7 @@ df4714f0-de54-4d61-bcdc-4976bdae510b,4f238ddc-5479-487e-b1a9-6bcacae4073f,Lewin 
 df55699d-7f2a-41bc-9a41-8b3bf8a5f67c,0d801f43-7b19-49ba-b4d5-6adfe7e827ed,Brzeg,False
 df5f4771-0127-4801-a4ed-c572cc38d1bd,b17b27f4-5f34-41f6-8a34-b49cffc687b2,Chrząstowice,False
 df761ac1-8a46-4a74-844c-90fcdb3ef25f,28a88443-76e3-4b45-afca-ef5119a6b4a2,Zabrze,True
-df889d6b-c805-4cfe-85b7-1f682342e522,51949e64-256e-4c12-a46d-5182c5a2e062,Dobrzeń Wielki,True
+df889d6b-c805-4cfe-85b7-1f682342e522,51949e64-256e-4c12-a46d-5182c5a2e062,Dobrzeń Wielki,False
 dfa45431-2c4c-44a3-87da-5c40d42eeefe,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzierzyn-Koźle,False
 dfda8537-8147-4224-b147-c858ec4db341,a16953b0-7fd7-48bb-9a4f-a870ebc0b50c,Kietrz,False
 dffd15a9-0c00-457d-85e5-b7c4363c641e,ffad36e4-7506-47d5-aa24-4f3fc1f5625c,Jemielnica,False
@@ -2829,7 +2829,7 @@ e0ec7a2b-1a12-473f-b2fc-efa18860435f,904f5ce8-b79a-4d2f-9ba3-92ec091d0a7b,Osowie
 e10fab7c-97ed-4eca-80c5-2339f7b3aae9,69b9dc31-6fc3-496c-a349-185a959e6d75,Staniątki,True
 e1116590-1cd2-402d-905f-61c22c085546,daab46d4-d252-46df-bb28-7a5744ce0146,Staniątki,True
 e122a607-fbdb-4ca7-8662-09dc909c2825,c505e379-167f-414c-a592-996a2aa44645,Cisek,False
-e1247613-63ae-4e43-8eb8-ce25a330dfc0,0de94959-30bb-4998-acaf-5d863d158fee,Szczecin,True
+e1247613-63ae-4e43-8eb8-ce25a330dfc0,0de94959-30bb-4998-acaf-5d863d158fee,Szczecin,False
 e13bafeb-9619-44e6-9b43-a3402a80d580,0d31de2b-867b-4f71-810f-b91b237daaa9,Kraków,True
 e14014fe-50e0-4245-aceb-584ba45d4d84,048d6a42-a9f0-426b-b629-ac3ca202c464,LZS POLSKI ŚWIĘTÓW (Polski Świętów 62),False
 e14d1898-89cd-4b4a-8874-e0c1096c757f,0f556035-0cce-4a59-86b8-f081e8baa7d8,Żernica,True
@@ -2901,7 +2901,7 @@ e61febae-4a23-422f-91af-dae505e13c00,208daa2b-e9d8-42da-8a39-2ffdea9d743d,Opole,
 e6687d35-cc51-4505-a283-4d8645373e63,cf9f3b80-aa74-494d-b728-027910ffa31b,Gliwice,True
 e66f78ff-6a4a-4d1e-8aed-8989d008f7e7,38f1b646-8e53-496e-8cf6-b73c31b92f38,Praszka,False
 e68f0513-7276-482b-8fb4-68c7445d05c6,75f79530-53f4-4d43-878f-acfc9ca49cee,Kraków,True
-e6d74d63-3b90-4fe3-b6e4-09ac092ee73a,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,True
+e6d74d63-3b90-4fe3-b6e4-09ac092ee73a,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,False
 e6dcd6c0-ea3c-4c5e-b0bf-7364ec44d6b3,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,False
 e7219856-67fe-4cfa-8a0b-922170510fd5,0a19e784-70e5-47eb-a26e-a374b87e2eba,LIMANOWA,True
 e74a4b01-8e7f-4e79-a975-b0c9b2385e79,14d3b273-b718-4fed-90e9-e1d604b4caae,NULL,False
@@ -2915,7 +2915,7 @@ e7bc61c2-f728-449f-82ac-a105ea138bb9,3ef0ba11-f7a8-4f65-9486-6d090293f83d,NULL,F
 e7dc7c6f-eb26-4172-a04c-b6dfe09e06be,69b9dc31-6fc3-496c-a349-185a959e6d75,Staniątki,True
 e7ebd5d8-06da-4f08-891e-9a39d519d114,f3d21dcd-6ee1-42ec-befa-b91a60f68a73,Kobylice,False
 e81b7e2d-9c3e-476b-86c5-ae86479e631b,0c4871b1-c8de-48ca-9ffa-908897579cf1,Rzeszów,True
-e83be151-a395-4c31-8532-7f67c3dafc7f,8f8bfae0-8e2d-4c99-aa6b-2e8ea2329d2b,Strzelce Opolskie,True
+e83be151-a395-4c31-8532-7f67c3dafc7f,8f8bfae0-8e2d-4c99-aa6b-2e8ea2329d2b,Strzelce Opolskie,False
 e84d03cf-58be-49a9-9e8c-10f23f8d3d0c,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
 e85c34ff-3266-4924-aabc-69e8bb038303,74fa394b-5786-4073-a126-a08ed9dab336,Nowiny,True
 e87c2b80-14c5-4cff-8d1f-7a7755363433,66fca5b1-e20d-4059-93d9-52d6a792048a,Komprachcice,False
@@ -2963,7 +2963,7 @@ eac205c3-58df-40e4-898f-590b666fe94d,6dde2939-b20f-4e5c-9720-2076e59c8629,Kędzi
 eadfc196-c148-4222-a8d9-e901c698388b,a6d63adf-7022-48b4-adcc-927c59d78eb1,Gogolin,False
 eaef0bf2-7ddf-42ff-a636-480451165c19,a5afddad-4dec-456a-91e4-3d41c5b585c9,GRODKÓW,False
 eafbca3e-abc0-4f74-9d6a-251e0cd76897,d2856809-39f5-4206-af32-063b26b8b145,NULL,False
-eb2287df-f5d5-468a-83a0-7b950ecd8459,bb454bf2-2c7b-446c-aa05-8b1595a21afa,GKS WIDAWA WILKÓW (Lubska),True
+eb2287df-f5d5-468a-83a0-7b950ecd8459,bb454bf2-2c7b-446c-aa05-8b1595a21afa,GKS WIDAWA WILKÓW (Lubska),False
 eb416170-c7fb-4657-b1a1-3232cf31dd10,b1e86f5e-2576-4dc9-9856-72845acf389e,NULL,False
 eb511b62-ed4b-4012-a1eb-aee52dd26076,38f1b646-8e53-496e-8cf6-b73c31b92f38,Praszka,False
 eb6765cc-00db-4ef2-8486-fbe7d5672433,5763ce0c-0806-459f-b7d4-31a8e63ee02b,Chorzów,True
@@ -2974,7 +2974,7 @@ ebd0ebd8-bb1b-4294-a513-b30a0b179059,0c08d623-a1d8-4753-b336-6e26184527ab,Źlini
 ec2474e5-b0d2-4b9b-804e-64dff9be754f,bf93b71f-31c2-47f5-a65c-041c924d1d17,Cisek,False
 ec30e337-6ac2-44b5-80a3-174876df2d3b,008ac1b7-065f-42f1-b67a-5fdeb1d06a38,Rzeszów,True
 ec5cad88-8c10-4c6b-a8ea-fc430b9d575d,cc578acf-2cb4-45f0-bc5c-1bafb38aa772,Zdzieszowice,False
-ec75d320-332c-4fad-9c86-5b2ded627bea,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,True
+ec75d320-332c-4fad-9c86-5b2ded627bea,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
 ec77bc2a-7185-4e96-81c4-2742bbeb1c7a,18e8000d-b3b9-4b15-804f-ade4083cdfea,Rudniki,False
 ec988828-5f15-40d9-9a90-e063a5ecbb57,51949e64-256e-4c12-a46d-5182c5a2e062,Dobrzeń Wielki,False
 ec99868a-ac18-4ea7-84ca-ead0c8c8046e,c69e7a92-5fa0-4c95-bf6b-a713d16b8968,Opole,False
@@ -2990,7 +2990,7 @@ ed30b915-579f-4359-bda9-b76a59de3e77,c37b3cc6-1a70-45de-8cdf-ed19e3643ba2,Gliwic
 ed31250c-171d-4814-876f-9c302135fe57,f69fcf1a-88a6-4082-9ac2-176bbb5906c4,Gliwice,True
 ed343491-cebe-436c-bccb-c10e40942d43,0c8662aa-fb9c-4c9d-b0f4-f8d2f783d763,Kluczbork,False
 ed402292-dc2f-44ac-b576-95e07b7b9383,83d76c41-6122-46d6-95d7-b5961529dc58,Brożec,False
-ed43917b-0d56-4694-a49d-0b55b29d3723,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,True
+ed43917b-0d56-4694-a49d-0b55b29d3723,ef915546-f4a6-4ad8-96a5-e9a3204b6f20,NULL,False
 ed596b40-1091-4ef3-8845-70d2916c164f,bc4d55ea-7788-4852-b535-e7f3952ea551,Opole,False
 ed5a2b0c-77de-4293-9998-66e715d04d54,dd9433ae-7e8d-4814-af22-395833658862,Kluczbork,False
 ed6d9a80-c19c-4587-963d-309681232ef0,75f79530-53f4-4d43-878f-acfc9ca49cee,Kraków,True
@@ -3035,7 +3035,7 @@ f0c60b49-7006-4b6f-a2f1-a6edbb7e486f,31270b10-aa1f-4db5-961e-1d06a7899582,Zdzies
 f0c816ca-fd1e-44ca-9d8d-4d964a5ab183,10142296-3de6-4956-b538-b5e951c71e7a,Strzelce Opolskie,False
 f0cd20e2-7440-4995-8b31-f6af63b8ca0a,5763ce0c-0806-459f-b7d4-31a8e63ee02b,Chorzów,True
 f10c4441-24b2-4856-b77e-4822cdd398c2,0d801f43-7b19-49ba-b4d5-6adfe7e827ed,Brzeg,False
-f112be23-326a-4e9b-b067-e4f60cd64b80,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,True
+f112be23-326a-4e9b-b067-e4f60cd64b80,d7f52509-0841-45eb-ae30-f06465970d9e,NULL,False
 f11c08f5-831a-4c00-97ba-7820c3b5b186,0a19e784-70e5-47eb-a26e-a374b87e2eba,LIMANOWA,True
 f1224cd6-0e77-4395-8ffd-293afa5ca2b8,daab46d4-d252-46df-bb28-7a5744ce0146,Staniątki,True
 f1278ee5-7e58-429f-806b-c4f952538166,3b0cc4dd-d1bb-4350-94e6-ef2f60f5e610,NULL,False
@@ -3100,7 +3100,7 @@ f597dc42-e699-4af0-8919-179fdcd2adbc,904f5ce8-b79a-4d2f-9ba3-92ec091d0a7b,Osowie
 f5c671da-102e-49a0-9297-0cc76aab6caa,19c2c26a-e667-463e-9dc5-9c3b7c21634c,Tarnów Op.,False
 f5ca1f3d-030c-4332-afdb-b040a3f62cce,ad09e05d-a4c6-4f05-b0c0-5e8cb08778ed,Zawadzkie,False
 f5df5739-b535-4a14-8955-760d2069a014,59147eed-5283-4224-b833-4d7599df8e6e,NULL,False
-f606a9ea-fef9-4ead-a5ab-b627edb68d88,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,True
+f606a9ea-fef9-4ead-a5ab-b627edb68d88,663e4f2d-86b6-4e8d-94fa-371a9df79a0a,Opole,False
 f6439995-cd66-4931-836e-ad641a1f0f8e,2a03780a-04c7-46d1-a3be-8e5aca6aa5b8,Prószków,False
 f64f623a-4f5b-4ad9-bfd7-a7f9397cb183,f47a4015-4c84-4e7a-9a7e-d2c8dcb05a81,Kolonowskie,False
 f6546ae6-d65d-4e31-a9cc-6dada6167743,b6ee7d1a-1551-4802-bc89-042b537757cc,Chrząstowice,False
@@ -3171,7 +3171,7 @@ fb711f7e-54ab-4f7a-a965-312e5d5cb12b,b505885a-de2f-420a-9764-d9c6b8b3edbe,Modlni
 fb84f9d7-769b-4964-8229-d34cc89e77ee,18e8000d-b3b9-4b15-804f-ade4083cdfea,Rudniki,False
 fb853e13-85df-4590-828b-75951c0b99f7,8241a998-962e-4f85-8e81-ea392793b71e,KIETRZ,False
 fb909198-fe61-4245-b469-acd25aa33057,5ee654bb-b6e3-411e-9402-ae1af82429f8,Dziewiętlice,False
-fb9bfb56-7340-4aa7-a821-fa191b6c1b89,a5afddad-4dec-456a-91e4-3d41c5b585c9,GRODKÓW,True
+fb9bfb56-7340-4aa7-a821-fa191b6c1b89,a5afddad-4dec-456a-91e4-3d41c5b585c9,GRODKÓW,False
 fba2840c-6dc3-45f3-a6b9-efa50f0a4272,a68f0c90-c073-4de5-9488-83c1527c787a,Branice,False
 fbadee5a-e324-42fc-a73d-16a991e53706,4bf6df34-76d0-4fa7-99d8-dd4fc17b1319,Opole,False
 fbb391a8-ea1c-4bb1-a390-71341cc49224,7b989e61-2a9f-4fba-933a-627cb89208f0,Kadłub,False
