@@ -1419,9 +1419,9 @@ def main():
                 if r >= 0.30: return 3
                 if r >= 0.12: return 2
                 return 1
-            _BCOL = {5: [0, 128, 0, 230], 4: [124, 190, 30, 230], 3: [240, 200, 0, 230],
-                     2: [245, 140, 0, 230], 1: [220, 50, 40, 230]}
-            _BPX = {5: 13, 4: 11, 3: 9, 2: 7, 1: 5}       # stały rozmiar w pikselach wg koszyka
+            _BCOL = {5: [8, 48, 107, 235], 4: [33, 102, 172, 230], 3: [67, 147, 195, 225],
+                     2: [146, 197, 222, 220], 1: [200, 224, 240, 210]}
+            _BPX = {5: 14, 4: 12, 3: 10, 2: 8, 1: 6}      # ciemniejszy i większy = więcej zawodników
             grp["b"] = grp["zawodnikow"].map(_bucket)
             grp["color"] = grp["b"].map(_BCOL)
             grp["px"] = grp["b"].map(_BPX)
@@ -1435,7 +1435,7 @@ def main():
                     radius_min_pixels=px, radius_max_pixels=px, pickable=True, stroked=True,
                     get_line_color=[255, 255, 255], line_width_min_pixels=1))
             layers.append(pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
-                                    get_fill_color="[33, 33, 33, 255]", get_radius=1600,
+                                    get_fill_color="[214, 39, 40, 255]", get_radius=1600,
                                     radius_min_pixels=9, radius_max_pixels=9, pickable=True,
                                     stroked=True, get_line_color=[255, 255, 255], line_width_min_pixels=2))
             st.pydeck_chart(pdk.Deck(
@@ -1443,8 +1443,8 @@ def main():
                 initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.5),
                 tooltip={"text": "{opis}"},
                 map_style=None))
-            st.caption("Kolor i wielkość kropki = liczba zawodników: 🟢 dużo · 🟡 średnio · 🔴 mało. "
-                       "⬛ Opole (cel). Miejscowości spoza regionu opisane w tooltipie i tabeli poniżej.")
+            st.caption("MAPA v3 · im ciemniejsza i większa kropka, tym więcej zawodników z tej "
+                       "miejscowości · 🔴 czerwony = Opole (cel testów). Szczegóły w tooltipie i tabeli poniżej.")
         except Exception:
             st.map(grp.rename(columns={"lat": "latitude", "lon": "longitude"})[["latitude", "longitude"]])
         with st.expander("📍 Skupiska zawodników wg miejscowości"):
