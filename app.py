@@ -294,6 +294,99 @@ def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
     return buf.getvalue()
 
 
+def _zaproszenie_klub_pdf(klub_docelowy, zawodnicy, data="", miejsce="", czas="", info=""):
+    """Jednostronicowe zaproszenie do KLUBU z listą jego zawodników (format jak powołania)."""
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.units import mm
+        from reportlab.lib import colors
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.utils import ImageReader
+    except Exception:
+        return None
+    import datetime as _dt, textwrap as _tw, glob as _glob
+    nasz = _secret("PM_KLUB", "OKS Odra Opole")
+    adres = _secret("PM_KLUB_ADRES", "ul. Leonarda Olejnika 1, 45-839 Opole")
+    logo = _secret("PM_KLUB_LOGO", "")
+    if not (logo and os.path.exists(logo)):
+        cand = _glob.glob("logo.*") or _glob.glob("*logo*.*")
+        logo = cand[0] if cand else None
+    buf = io.BytesIO(); c = canvas.Canvas(buf, pagesize=A4); W, H = A4
+    y = H - 25 * mm
+    if logo and os.path.exists(logo):
+        try:
+            img = ImageReader(logo); iw, ih = img.getSize(); w = 34 * mm; h = w * ih / iw
+            c.drawImage(img, (W - w) / 2, y - h + 8 * mm, width=w, height=h, preserveAspectRatio=True, mask="auto")
+            y -= h
+        except Exception:
+            pass
+    c.setFont("Helvetica-Bold", 15); c.drawCentredString(W / 2, y, nasz); y -= 6 * mm
+    c.setFont("Helvetica", 9); c.drawCentredString(W / 2, y, adres); y -= 5 * mm
+    c.setStrokeColor(colors.HexColor("#c0392b")); c.setLineWidth(1.1); c.line(22 * mm, y, W - 22 * mm, y); y -= 12 * mm
+    c.setFont("Helvetica", 10); c.drawRightString(W - 22 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 12 * mm
+    c.setFont("Helvetica-Bold", 13); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 10 * mm
+    c.setFont("Helvetica", 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
+    intro = (f"{nasz} zaprasza na testy do drużyny młodzieżowej następujących zawodników "
+             f"z klubu {klub_docelowy}:")
+    for w in _tw.wrap(intro, 95):
+        t.textLine(w)
+    t.textLine("")
+    c.drawText(t); y = t.getY()
+    c.setFont("Helvetica", 10.5)
+    for i, (nm, rok) in enumerate(zawodnicy, 1):
+        c.drawString(26 * mm, y, f"{i}. {nm}" + (f"  (rocznik {rok})" if rok else ""))
+        y -= 6 * mm
+        if y < 45 * mm:
+            c.showPage(); y = H - 25 * mm; c.setFont("Helvetica", 10.5)
+    y -= 6 * mm
+    c.setFont("Helvetica", 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
+    if data or miejsce or czas:
+        t.textLine("Termin i miejsce:")
+        if data:    t.textLine(f"  Data: {data}")
+        if czas:    t.textLine(f"  Godzina: {czas}")
+        if miejsce: t.textLine(f"  Miejsce: {miejsce}")
+        t.textLine("")
+    if info:
+        for w in _tw.wrap(info, 95):
+            t.textLine(w)
+        t.textLine("")
+    for w in _tw.wrap("Prosimy o potwierdzenie obecności zawodników. Prosimy zabrać strój treningowy, "
+                      "obuwie na nawierzchnię naturalną i sztuczną oraz ochraniacze.", 95):
+        t.textLine(w)
+    c.drawText(t)
+    c.setFont("Helvetica", 10.5); c.drawRightString(W - 22 * mm, 32 * mm, "Z wyrazami szacunku,")
+    c.drawRightString(W - 22 * mm, 26 * mm, nasz)
+    c.showPage(); c.save(); buf.seek(0)
+    return buf.getvalue()
+
+
+def _koszyk_zip(cart_df, data="", miejsce="", czas="", info="", max_klub=0, wyklucz=None):
+    """Buduje ZIP: jeden PDF na klub (z listą jego zawodników). Zwraca (bajty_zip, podsumowanie)."""
+    import zipfile
+    wyklucz = set(wyklucz or [])
+    df = cart_df.copy()
+    df["_klub"] = df["club_name"].fillna("(brak klubu)").replace("", "(brak klubu)")
+    df["_rok"] = df.get("est_birth_year", "").astype(str).str.split(".").str[0].replace("nan", "")
+    buf = io.BytesIO()
+    podsum = []
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for klub, g in df.groupby("_klub"):
+            if klub in wyklucz:
+                continue
+            g = g.sort_values("PM_Index", ascending=False) if "PM_Index" in g.columns else g
+            if max_klub and max_klub > 0:
+                g = g.head(int(max_klub))
+            zaw = list(zip(g["zawodnik"], g["_rok"]))
+            pdf = _zaproszenie_klub_pdf(klub, zaw, data, miejsce, czas, info)
+            if not pdf:
+                return None, []
+            fn = re.sub(r"[^\w\-]+", "_", str(klub)).strip("_") or "klub"
+            zf.writestr(f"zaproszenie_{fn}.pdf", pdf)
+            podsum.append((klub, len(zaw)))
+    buf.seek(0)
+    return buf.getvalue(), podsum
+
+
 def compute_pm_score(df):
     """Realny PlayMaker Score 2.0 per mecz (ścieżka domyślna). Zwraca pd.Series w skali 0..1."""
     idx = df.index
@@ -886,6 +979,8 @@ def _intro_md():
 
 def main():
     st.set_page_config(page_title="Almanach ligowy", layout="wide")
+    if "koszyk" not in st.session_state:
+        st.session_state["koszyk"] = set()
     st.markdown(CSS, unsafe_allow_html=True)
     if not check_password():
         st.stop()
@@ -1138,26 +1233,75 @@ def main():
         sel_pid = None
         select_mode = "rerun"
 
-    disp = ftab[[c for c in cmap if c in ftab.columns]].rename(columns=cmap)
-    event = st.dataframe(
+    _cart = st.session_state["koszyk"]
+    bc = st.columns([3, 2, 5])
+    if bc[0].button(f"➕ Do koszyka wszystkich widocznych ({len(f)})", use_container_width=True):
+        st.session_state["koszyk"] = _cart | set(f["player_id"])
+        st.rerun()
+    if bc[1].button(f"🗑️ Wyczyść koszyk ({len(_cart)})", use_container_width=True):
+        st.session_state["koszyk"] = set()
+        st.rerun()
+    bc[2].caption("🧺 Zaznacz w kolumnie ▸ koszyk pamięta wybór mimo zmiany filtrów. "
+                  "**Odświeżenie strony kasuje koszyk.**")
+
+    ed = ftab.set_index("player_id").copy()
+    ed.insert(0, "🧺", ed.index.isin(_cart))
+    disp = ed[["🧺"] + [c for c in cmap if c in ed.columns]].rename(columns=cmap)
+    edited = st.data_editor(
         disp, use_container_width=True, height=285, hide_index=True,
-        on_select=select_mode, selection_mode="single-row",
+        disabled=[c for c in disp.columns if c != "🧺"], key=K("editor"),
         column_config={
+            "🧺": st.column_config.CheckboxColumn("🧺", help="dodaj do koszyka zaproszeń", default=False),
             "PM Index": st.column_config.NumberColumn(format="%.2f", help=PM_HELP),
-            "Score (liga)": st.column_config.NumberColumn(format="%.3f",
-                help="Realny PlayMaker Score 2.0 (v7) — średnia ważona minutami z meczów w wybranym "
-                     "zakresie. Dla młodzieży leagueMultiplier z poziomu rozgrywek (rank_p)."),
-            "Score (total)": st.column_config.NumberColumn(format="%.3f",
-                help="Realny PlayMaker Score 2.0 (v7) — średnia ważona minutami ze wszystkich meczów sezonu."),
-            "Poziom": st.column_config.NumberColumn(format="%.1f",
-                help="Średni rank_p rozgrywek (0 = topowe juniorskie / CLJ, 10 = słabe lokalne). Niżej = mocniej."),
-            "Premia": st.column_config.NumberColumn(format="%.2f",
-                help="Premia kontekstowa doliczona do PM Index (gra ze starszymi / kadra / minuty w seniorach)."),
+            "Score (liga)": st.column_config.NumberColumn(format="%.3f"),
+            "Score (total)": st.column_config.NumberColumn(format="%.3f"),
+            "Poziom": st.column_config.NumberColumn(format="%.1f"),
+            "Premia": st.column_config.NumberColumn(format="%.2f"),
             "Znaczniki": st.column_config.TextColumn(
                 help="↑ gra ze starszymi · 🪑 w kadrze seniorów · ⚽ minuty w seniorach · 🏅 minuty w CLJ")})
+    # synchronizacja koszyka: tylko widoczne wiersze mogą zmienić stan
+    _visible = set(ed.index)
+    _checked = set(edited.index[edited["🧺"] == True]) if "🧺" in edited.columns else set()
+    _new = (st.session_state["koszyk"] - _visible) | _checked
+    if _new != st.session_state["koszyk"]:
+        st.session_state["koszyk"] = _new
+        st.rerun()
 
-    if sel_pid is None and event.selection.rows:
-        sel_pid = ftab.iloc[event.selection.rows[0]]["player_id"]
+    # ---- KOSZYK ZAPROSZEŃ (przetrwa filtry; odświeżenie strony kasuje) ----
+    _cart = st.session_state["koszyk"]
+    if _cart:
+        cart_df = data[data["player_id"].isin(_cart)].copy()
+        if "PM_Index" in cart_df.columns:
+            cart_df = cart_df.sort_values("PM_Index", ascending=False)
+        with st.expander(f"🧺 Koszyk zaproszeń — {len(cart_df)} zawodników z "
+                         f"{cart_df['club_name'].nunique()} klubów", expanded=False):
+            st.warning("Odświeżenie strony kasuje koszyk — wygeneruj i pobierz ZIP przed odświeżeniem.")
+            prev = cart_df[["zawodnik", "club_name", "est_birth_year"]].rename(
+                columns={"zawodnik": "Zawodnik", "club_name": "Klub", "est_birth_year": "Rocznik"})
+            st.dataframe(prev, use_container_width=True, hide_index=True, height=180)
+            st.markdown("**Dane test-meczu (wejdą do wszystkich zaproszeń):**")
+            e = st.columns(3)
+            ev_data = e[0].text_input("Data", key=K("ev_data"))
+            ev_miejsce = e[1].text_input("Miejsce", key=K("ev_miejsce"))
+            ev_czas = e[2].text_input("Godzina", key=K("ev_czas"))
+            ev_info = st.text_area("Dodatkowe informacje (opcjonalnie)", key=K("ev_info"))
+            o = st.columns(2)
+            max_klub = o[0].number_input("Maks. zawodników z jednego klubu (0 = bez limitu)",
+                                         0, 50, 0, key=K("maxklub"))
+            excl = o[1].multiselect("Wyklucz kluby (np. z powodu niesnasek)",
+                                    sorted(cart_df["club_name"].dropna().unique()), key=K("excl"))
+            if st.button("📄 Przygotuj zaproszenia (ZIP — po jednym PDF na klub)", type="primary"):
+                res = _koszyk_zip(cart_df, ev_data, ev_miejsce, ev_czas, ev_info, max_klub, excl)
+                if res and res[0]:
+                    st.session_state["_zip"], st.session_state["_zip_pod"] = res
+                else:
+                    st.error("Brak biblioteki reportlab — dodaj 'reportlab' do requirements.txt.")
+            if st.session_state.get("_zip"):
+                pod = st.session_state.get("_zip_pod", [])
+                st.success(f"Gotowe: {len(pod)} klubów, {sum(n for _, n in pod)} zaproszeń.")
+                st.download_button("⬇️ Pobierz ZIP zaproszeń", st.session_state["_zip"],
+                                   file_name="zaproszenia_na_testy.zip", mime="application/zip",
+                                   use_container_width=True)
 
     # ---- PODSUMOWANIE SEZONU (per rozgrywki) — zawsze widoczne, jak mecze ----
     if sel_pid:
@@ -1232,17 +1376,26 @@ def main():
                    f"Wielkość kropki = liczba zawodników.")
         try:
             import pydeck as pdk
-            grp["radius"] = 2000 + grp["zawodnikow"] ** 0.5 * 2200
-            grp["color"] = grp["spoza"].map(lambda s: [255, 140, 0, 180] if s else [31, 119, 180, 170])
+            _mx = max(int(grp["zawodnikow"].max()), 1)
+            def _col(row):
+                if row["spoza"]:
+                    return [255, 140, 0, 200]           # spoza regionu = pomarańczowy
+                inten = row["zawodnikow"] / _mx          # gęstość -> intensywność (jasny->ciemny niebieski)
+                return [max(40, int(150 - 110 * inten)), max(90, int(190 - 120 * inten)), 230, 210]
+            grp["color"] = grp.apply(_col, axis=1)
+            grp["radius"] = 1300                          # stała, mała kropka — nie nachodzą
             opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "miejscowosc": "OPOLE (cel)",
-                                   "zawodnikow": 0, "radius": 4000}])
+                                   "zawodnikow": 0}])
             l_pts = pdk.Layer("ScatterplotLayer", data=grp, get_position="[lon, lat]",
-                              get_fill_color="color", get_radius="radius", pickable=True)
+                              get_fill_color="color", get_radius="radius",
+                              radius_min_pixels=4, radius_max_pixels=14, pickable=True, stroked=True,
+                              get_line_color=[255, 255, 255], line_width_min_pixels=1)
             l_op = pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
-                             get_fill_color="[214, 39, 40, 230]", get_radius="radius")
+                             get_fill_color="[214, 39, 40, 240]", get_radius=2600,
+                             radius_min_pixels=7, radius_max_pixels=18)
             st.pydeck_chart(pdk.Deck(
                 layers=[l_pts, l_op],
-                initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.2),
+                initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.4),
                 tooltip={"text": "{miejscowosc}\n{zawodnikow} zawodników\n~{km} km do Opola"},
                 map_style=None))
         except Exception:
