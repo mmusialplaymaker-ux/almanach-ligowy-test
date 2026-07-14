@@ -303,16 +303,18 @@ def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
     c.drawRightString(W - 25 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 16 * mm
     c.setFont(FB, 15); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 14 * mm
     c.setFont(F, 11); t = c.beginText(25 * mm, y); t.setLeading(16)
+    from reportlab.lib.utils import simpleSplit
+    _maxw = W - 50 * mm
     t.textLine("Szanowni Państwo,"); t.textLine("")
     linia = (f"{klub} ma przyjemność zaprosić zawodnika {zawodnik}"
              + (f" (rocznik {rocznik})" if rocznik else "")
              + (f", {klub_zaw}," if klub_zaw else "")
              + " na testy do drużyny młodzieżowej naszego klubu.")
-    for w in _tw.wrap(linia, 92):
+    for w in simpleSplit(linia, F, 11, _maxw):
         t.textLine(w)
     t.textLine("")
-    for w in _tw.wrap("Prosimy o potwierdzenie obecności oraz zabranie stroju treningowego, "
-                      "obuwia na nawierzchnię naturalną i sztuczną oraz ochraniaczy.", 92):
+    for w in simpleSplit("Prosimy o potwierdzenie obecności oraz zabranie stroju treningowego, "
+                         "obuwia na nawierzchnię naturalną i sztuczną oraz ochraniaczy.", F, 11, _maxw):
         t.textLine(w)
     c.drawText(t)
     c.setFont(F, 11)
@@ -355,9 +357,11 @@ def _zaproszenie_klub_pdf(klub_docelowy, zawodnicy, data="", miejsce="", czas=""
     c.setFont(F, 10); c.drawRightString(W - 22 * mm, y, "Opole, dnia " + _dt.date.today().strftime("%d.%m.%Y") + " r."); y -= 12 * mm
     c.setFont(FB, 13); c.drawCentredString(W / 2, y, "ZAPROSZENIE NA TESTY"); y -= 10 * mm
     c.setFont(F, 10.5); t = c.beginText(22 * mm, y); t.setLeading(15)
+    _maxw = W - 44 * mm
+    from reportlab.lib.utils import simpleSplit
     intro = (f"{nasz} zaprasza na testy do drużyny młodzieżowej następujących zawodników "
              f"z klubu {klub_docelowy}:")
-    for w in _tw.wrap(intro, 95):
+    for w in simpleSplit(intro, F, 10.5, _maxw):
         t.textLine(w)
     t.textLine("")
     c.drawText(t); y = t.getY()
@@ -376,11 +380,11 @@ def _zaproszenie_klub_pdf(klub_docelowy, zawodnicy, data="", miejsce="", czas=""
         if miejsce: t.textLine(f"  Miejsce: {miejsce}")
         t.textLine("")
     if info:
-        for w in _tw.wrap(info, 95):
+        for w in simpleSplit(info, F, 10.5, _maxw):
             t.textLine(w)
         t.textLine("")
-    for w in _tw.wrap("Prosimy o potwierdzenie obecności zawodników. Prosimy zabrać strój treningowy, "
-                      "obuwie na nawierzchnię naturalną i sztuczną oraz ochraniacze.", 95):
+    for w in simpleSplit("Prosimy o potwierdzenie obecności zawodników. Prosimy zabrać strój treningowy, "
+                         "obuwie na nawierzchnię naturalną i sztuczną oraz ochraniacze.", F, 10.5, _maxw):
         t.textLine(w)
     c.drawText(t)
     c.setFont(F, 10.5); c.drawRightString(W - 22 * mm, 32 * mm, "Z wyrazami szacunku,")
