@@ -252,13 +252,13 @@ def _pl_font():
             pass
         reg = next((p for p in cands if os.path.exists(p)), None)
         if not reg:
-            return (F, FB)
+            return ("Helvetica", "Helvetica-Bold")
         bold = reg.replace("DejaVuSans.ttf", "DejaVuSans-Bold.ttf")
         pdfmetrics.registerFont(TTFont("PL", reg))
         pdfmetrics.registerFont(TTFont("PL-Bold", bold if os.path.exists(bold) else reg))
         return ("PL", "PL-Bold")
     except Exception:
-        return (F, FB)
+        return ("Helvetica", "Helvetica-Bold")
 
 
 def _zaproszenie_pdf(zawodnik, rocznik="", klub_zaw=""):
@@ -1400,6 +1400,9 @@ def main():
                  .reset_index())
         grp["spoza"] = grp["spoza"] > 0.5                    # spoza tylko gdy WIĘKSZOŚĆ spoza
         grp["km"] = pd.to_numeric(grp["km"], errors="coerce").fillna(0).round().astype(int)
+        grp["opis"] = (grp["miejscowosc"].astype(str) + " — "
+                       + grp["zawodnikow"].astype(str) + " zawodn., ~" + grp["km"].astype(str) + " km"
+                       + grp["spoza"].map(lambda s: " (spoza regionu)" if s else ""))
         n_sp = int(grp["spoza"].sum())
         st.caption(f"{int(grp['zawodnikow'].sum())} zawodników w {len(grp)} miejscowościach. "
                    f"🔵 w regionie · 🟠 spoza regionu ({n_sp}) · 🔴 Opole (cel). "
@@ -1407,24 +1410,43 @@ def main():
         try:
             import pydeck as pdk
             _mx = max(int(grp["zawodnikow"].max()), 1)
-            grp["color"] = grp["spoza"].map(lambda s: [255, 140, 0, 210] if s else [21, 101, 192, 210])
-            # promień proporcjonalny do udziału względem max (√ dla łagodności), w metrach
-            grp["radius"] = 1500 + (grp["zawodnikow"] / _mx) ** 0.5 * 11000
-            grp["opis"] = grp["miejscowosc"].astype(str) + " — " + grp["zawodnikow"].astype(str) + " zawodn., ~" + grp["km"].astype(str) + " km"
-            opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "radius": 3500,
-                                   "opis": "OPOLE — cel testów"}])
-            l_pts = pdk.Layer("ScatterplotLayer", data=grp, get_position="[lon, lat]",
-                              get_fill_color="color", get_radius="radius",
-                              radius_min_pixels=4, radius_max_pixels=40, pickable=True, stroked=True,
-                              get_line_color=[255, 255, 255], line_width_min_pixels=1)
-            l_op = pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
-                             get_fill_color="[214, 39, 40, 245]", get_radius="radius",
-                             radius_min_pixels=8, radius_max_pixels=16, pickable=True)
+
+            def _bucket(n):
+                r = n / _mx
+                if r >= 0.80: return 5
+                if r >= 0.55: return 4
+                if r >= 0.30: return 3
+                if r >= 0.12: return 2
+                return 1
+            _BCOL = {5: [0, 128, 0, 230], 4: [124, 190, 30, 230], 3: [240, 200, 0, 230],
+                     2: [245, 140, 0, 230], 1: [220, 50, 40, 230]}
+            _BPX = {5: 13, 4: 11, 3: 9, 2: 7, 1: 5}       # stały rozmiar w pikselach wg koszyka
+            grp["b"] = grp["zawodnikow"].map(_bucket)
+            grp["color"] = grp["b"].map(_BCOL)
+            grp["px"] = grp["b"].map(_BPX)
+            # obrys pomarańczowy dla miejscowości spoza regionu (fill dalej = kolor liczby)
+            grp["line"] = grp["spoza"].map(lambda s: [255, 140, 0] if s else [255, 255, 255])
+            grp["lw"] = grp["spoza"].map(lambda s: 3 if s else 1)
+            opole = pd.DataFrame([{"lat": 50.6751, "lon": 17.9213, "opis": "OPOLE — cel testów"}])
+            layers = []
+            for b, sub in grp.groupby("b"):     # osobna warstwa na koszyk = stały rozmiar w px
+                px = int(_BPX[b])
+                layers.append(pdk.Layer(
+                    "ScatterplotLayer", data=sub, get_position="[lon, lat]",
+                    get_fill_color="color", get_radius=px * 120,
+                    radius_min_pixels=px, radius_max_pixels=px, pickable=True, stroked=True,
+                    get_line_color="line", get_line_width="lw", line_width_min_pixels=1))
+            layers.append(pdk.Layer("ScatterplotLayer", data=opole, get_position="[lon, lat]",
+                                    get_fill_color="[33, 33, 33, 255]", get_radius=1600,
+                                    radius_min_pixels=9, radius_max_pixels=9, pickable=True,
+                                    stroked=True, get_line_color=[255, 255, 255], line_width_min_pixels=2))
             st.pydeck_chart(pdk.Deck(
-                layers=[l_pts, l_op],
-                initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.4),
+                layers=layers,
+                initial_view_state=pdk.ViewState(latitude=50.67, longitude=17.92, zoom=7.5),
                 tooltip={"text": "{opis}"},
                 map_style=None))
+            st.caption("🟢 dużo · 🟡 średnio · 🔴 mało zawodników · ⬛ Opole (cel) · "
+                       "pomarańczowy obwód = miejscowość spoza regionu.")
         except Exception:
             st.map(grp.rename(columns={"lat": "latitude", "lon": "longitude"})[["latitude", "longitude"]])
         with st.expander("📍 Skupiska zawodników wg miejscowości"):
