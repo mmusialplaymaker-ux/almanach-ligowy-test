@@ -1,8 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-wyznacz_rocznik.py - weryfikuje ROCZNIK zawodnika po FLOORZE lig z historii.
+wyznacz_rocznik.py (v2) - wyznacza PRZEDZIAL rocznika zawodnika.
 SAMODZIELNY (nie wymaga app.py).
+
+ZMIANA v2 vs v1: zamiast jednej wartosci "rocznik_final" zwracamy PRZEDZIAL
+[rocznik_od, rocznik_do] + punktowa estymate + uczciwa etykiete pewnosci.
+
+Podstawa: blad estymacji jest JEDNOKIERUNKOWY. Zrodlo podaje WIEK, ingest cofa
+date o tyle lat od dnia pobrania. Jesli urodziny juz minely -> rocznik poprawny.
+Jesli nie minely -> rocznik o 1 ZA MLODY. Nigdy za stary.
+Potwierdzone: 98.6% meczow mlodziezowych ma rocznik zgodny z regulaminem.
+    => prawda ∈ {rocznik_z_daty - 1, rocznik_z_daty}
+
+Drugie ograniczenie, z regulaminu: w lidze o graniczniku Y nie zagra nikt starszy
+niz Y, wiec grajac w niej => rocznik >= Y. MAX(Y) po ligach i sezonach = floor.
+    => prawda >= floor
+
+Przeciecie obu daje status:
+    data == floor    -> prawda = {floor}          -> PEWNY (jeden punkt)
+    data == floor+1  -> prawda = {floor, floor+1} -> ZAWEZONY (remis 2-opcyjny)
+    data >  floor+1  -> prawda = {data-1, data}   -> NIEPEWNY (floor nie pomaga)
+    data <  floor    -> sprzecznosc               -> BLEDNY (rekord do zgloszenia)
+    brak floora      -> prawda = {data-1, data}   -> NIEPEWNY
+
+PEWNY wymaga, by zawodnik zagral SWOJA kategorie choc raz w 5 sezonach. Kto nigdy
+nie gra wlasnej kategorii (flaga zawsze_w_gore) - nie da sie potwierdzic.
+
+Dla ZAWEZONEGO wybieramy floor (jak v1). Uzasadnienie bayesowskie:
+    prawda = floor    <=> data zla (~25%) I gra wlasna kategorie (~80%) ~ 0.20
+    prawda = floor+1  <=> data dobra (~75%) I gra rocznik w gore (~20%) ~ 0.15
+czyli ok. 57:43 na korzysc floora. Wybor dobry, ale to nie jest pewnik - i wlasnie
+dlatego dostaje osobna etykiete, a nie "skorygowany" w jednym worku z BLEDNYM.
 
 Idea: w danej lidze (sezonie) nie zagra nikt starszy niz rocznik graniczny Y.
 Wiec grajac w lidze o graniczniku Y => rocznik >= Y. Bierzemy MAX(Y) po wszystkich
@@ -42,10 +71,11 @@ _CAT_MAXYEAR_PATS = [
 
 # prefiks season_id -> rok konca sezonu
 SEASON_END_YEAR = {
-    "e9d66181": 2026,  # 25/26
+    "e9d66181": 2026,  # 25/26 (biezacy)
     "4be7b40c": 2025,  # 24/25
     "29d748c8": 2024,  # 23/24
     "b004c86c": 2023,  # 22/23
+    "b682af6d": 2022,  # 21/22  <- 4 sezony wstecz (musi byc zgodne z rocznik_historia.sql)
 }
 ENCODINGS = ("utf-8", "cp1250", "latin-1")
 
@@ -111,42 +141,52 @@ def main():
         else:
             floor, dowod = None, ""
 
-        if floor is None:
-            status, final = "BRAK_HISTORII", date_z
+        # ── przeciecie dwoch ograniczen -> przedzial + status ──
+        if floor is None and date_z is None:
+            status, od, do, final = "brak", None, None, None
+        elif floor is None:
+            # brak historii ligowej -> tylko model estymacji
+            status, od, do, final = "niepewny", date_z - 1, date_z, date_z
         elif date_z is None:
-            status, final = "BRAK_DATY", floor
-        elif date_z == floor:
-            status, final = "POTWIERDZONY", floor          # gra wlasna kategorie - rocznik pewny
-        elif abs(date_z - floor) >= 4:
-            status, final = "SPRAWDZ", date_z              # ogromna roznica -> zepsuty rekord, do wgladu
+            # floor to tylko DOLNA granica, gornej brak
+            status, od, do, final = "niepewny", floor, None, floor
         elif date_z < floor:
-            status, final = "KOREKTA", floor               # za stary (niemozliwe wg lig) -> floor wygrywa
+            # data mowi STARSZY niz ligi dopuszczaja -> model estymacji zlamany
+            status, od, do, final = "bledny", floor, None, floor
+        elif date_z == floor:
+            # jedyny przypadek PEWNY: oba ograniczenia wskazuja ten sam punkt
+            status, od, do, final = "pewny", floor, floor, floor
         elif date_z - floor == 1:
-            status, final = "KOREKTA", floor               # o rok za mlody (czesty bug zrodla) -> floor
+            # remis 2-opcyjny: data zla + wlasna kategoria  ALBO  data dobra + rok w gore
+            status, od, do, final = "zawezony", floor, date_z, floor
         else:
-            status, final = "SPRAWDZ", date_z              # 2-3 lata za mlody: bug ALBO gra w gore -> feedback
+            # gra 2+ rocznikow w gore; floor nie zaweza, zostaje samo +/-1 z estymacji
+            status, od, do, final = "niepewny", date_z - 1, date_z, date_z
 
         roznica = (date_z - floor) if (floor is not None and date_z is not None) else None
-        if status == "SPRAWDZ" and floor is not None and date_z is not None:
-            widelki = f"{min(floor, date_z)}-{max(floor, date_z)}"
+        # niezmiennik: pewny <=> od == do
+        if od is not None and do is not None and od == do:
+            widelki = str(od)
+        elif od is not None and do is not None:
+            widelki = f"{od}-{do}"
         else:
-            widelki = str(final) if final is not None else ""
-        pewnosc = {
-            "POTWIERDZONY": "pewny",
-            "KOREKTA": "pewny (z historii)",
-            "SPRAWDZ": f"do weryfikacji ({widelki})",
-            "BRAK_HISTORII": "tylko źródło",
-            "BRAK_DATY": "z historii",
-        }.get(status, "?")
+            widelki = f"{od}+" if od is not None else ""
+        # zawsze_w_gore: nigdy nie zagral ligi, ktorej granica == jego rocznik_final
+        zawsze_w_gore = bool(final is not None and len(q)
+                             and not (q["_ybound"].astype(int) == int(final)).any())
         rows.append({
             "player_id": pid, "zawodnik": nm,
             "rocznik_z_daty": date_z, "rocznik_z_lig": floor,
-            "rocznik_final": final, "roznica_lat": roznica,
-            "status": status, "pewnosc": pewnosc, "widelki": widelki,
-            "dowod_floor": dowod,
+            "rocznik_od": od, "rocznik_do": do, "rocznik": final,
+            "roznica_lat": roznica, "pewnosc": status, "widelki": widelki,
+            "zawsze_w_gore": zawsze_w_gore, "dowod": dowod,
+            # kompatybilnosc wstecz z v1 (istniejacy precompute.py czyta te kolumny):
+            "rocznik_final": final,
+            "status": {"pewny": "POTWIERDZONY", "zawezony": "KOREKTA", "bledny": "KOREKTA",
+                       "niepewny": "SPRAWDZ", "brak": "BRAK_HISTORII"}.get(status, "SPRAWDZ"),
         })
 
-    out = pd.DataFrame(rows).sort_values(["status", "roznica_lat", "zawodnik"],
+    out = pd.DataFrame(rows).sort_values(["pewnosc", "roznica_lat", "zawodnik"],
                                          na_position="last")
     try:
         out.to_csv(a.out, index=False, encoding="utf-8-sig")
@@ -154,17 +194,32 @@ def main():
         print(f"\nBLAD: nie moge zapisac {a.out} - plik jest OTWARTY w Excelu/LibreOffice.")
         print("Zamknij go i uruchom ponownie.")
         sys.exit(1)
-    print(f"Zapisano {a.out}: {len(out)} zawodnikow")
-    print("Rozklad statusow:")
-    for k, v in out["status"].value_counts().items():
-        print(f"  {k}: {v}")
-    kor = out[out["status"] == "KOREKTA"]
-    if len(kor):
-        print(f"KOREKTY (floor wygrywa, o rok obok) wg kierunku (data-floor): "
-              f"{kor['roznica_lat'].value_counts().sort_index().to_dict()}")
-    rec = out[out["status"] == "SPRAWDZ"]
-    if len(rec):
-        print(f"SPRAWDZ (>=2 lata roznicy, do wgladu): {len(rec)}")
+    print(f"Zapisano {a.out}: {len(out)} zawodnikow\n")
+    print("Rozklad pewnosci (pewny/reczny odblokowuja premie > 1.30 w PM Score):")
+    OPIS = {
+        "pewny":    "data == floor -> jeden punkt, potwierdzony liga",
+        "zawezony": "data == floor+1 -> remis {floor, floor+1}, bierzemy floor",
+        "niepewny": "floor nie zaweza (brak historii lub gra 2+ w gore) -> +/-1",
+        "bledny":   "data starsza niz ligi dopuszczaja -> rekord do zgloszenia",
+        "brak":     "brak danych",
+    }
+    n = len(out)
+    for k, v in out["pewnosc"].value_counts().items():
+        gate = "PELNA SKALA" if k == "pewny" else "cap 1.30"
+        licznik = f"{v:,}".replace(",", " ")
+        print(f"  {k:<10} {licznik:>9} ({v/n*100:>4.1f}%)  [{gate:<11}] {OPIS.get(k,'')}")
+    pewnych = (out["pewnosc"] == "pewny").sum()
+    print(f"\n  Pelna skala premii dostepna dla: {pewnych:,} / {n:,} ({pewnych/n*100:.1f}%)".replace(",", " ").replace("  (", " ("))
+    zwg = out["zawsze_w_gore"].sum()
+    print(f"  Nigdy nie grali wlasnej kategorii (zawsze_w_gore): {zwg:,} — floor ich nie potwierdzi".replace(",", " "))
+    bled = (out["pewnosc"] == "bledny").sum()
+    if bled:
+        print(f"  Rekordy sprzeczne z regulaminem (do zgloszenia w zrodle): {bled:,}".replace(",", " "))
+    # niezmiennik
+    bad = out[(out["rocznik_od"].notna()) & (out["rocznik_do"].notna())
+              & ((out["rocznik_do"] - out["rocznik_od"]) > 1)]
+    if len(bad):
+        print(f"\n  UWAGA: {len(bad)} zawodnikow ma przedzial szerszy niz 1 rocznik — to blad logiki!")
 
 
 if __name__ == "__main__":
